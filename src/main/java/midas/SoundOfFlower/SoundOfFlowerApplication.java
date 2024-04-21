@@ -1,7 +1,10 @@
 package midas.SoundOfFlower;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class SoundOfFlowerApplication {
@@ -10,4 +13,8 @@ public class SoundOfFlowerApplication {
 		SpringApplication.run(SoundOfFlowerApplication.class, args);
 	}
 
+	@Bean
+	JPAQueryFactory jpaQueryFactory(EntityManager em) {
+		return new JPAQueryFactory(em);
+	}
 }
