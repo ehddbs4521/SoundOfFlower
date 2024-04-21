@@ -3,6 +3,7 @@ package midas.SoundOfFlower.oauth.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import midas.SoundOfFlower.entity.Role;
 import midas.SoundOfFlower.entity.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
