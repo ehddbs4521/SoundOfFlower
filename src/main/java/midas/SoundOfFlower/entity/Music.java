@@ -18,8 +18,6 @@ import lombok.NoArgsConstructor;
 public class Music {
 
     @Id
-    private Long Id;
-
     private Long musicId;
     private String title;
     private String singer;
