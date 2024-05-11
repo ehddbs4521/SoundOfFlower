@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RequestMapping("/diary")
 @RestController
 @RequiredArgsConstructor
@@ -24,8 +26,8 @@ public class DiaryController {
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String socialId = principal.getUsername();
 
-        DiaryInfoResponse diaryInfoResponse = diaryService.searchDiaryInfo(month, socialId);
+        List<DiaryInfoResponse> diaryInfoResponses = diaryService.searchDiaryInfo(month, socialId);
 
-        return ResponseEntity.ok(diaryInfoResponse);
+        return ResponseEntity.ok(diaryInfoResponses);
     }
 }

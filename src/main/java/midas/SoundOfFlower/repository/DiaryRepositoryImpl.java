@@ -6,6 +6,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import midas.SoundOfFlower.dto.response.DiaryInfoResponse;
 
+import java.util.List;
+
 import static midas.SoundOfFlower.entity.QDiary.diary;
 import static org.springframework.util.StringUtils.isEmpty;
 
@@ -19,7 +21,7 @@ public class DiaryRepositoryImpl implements SearchDiary {
     }
 
     @Override
-    public DiaryInfoResponse getDiaryInfo(Long month, String socialId) {
+    public List<DiaryInfoResponse> getDiaryInfo(Long month, String socialId) {
         return queryFactory
                 .select(Projections.fields(DiaryInfoResponse.class,
                         diary.comment,
@@ -37,7 +39,7 @@ public class DiaryRepositoryImpl implements SearchDiary {
                 ))
                 .from(diary)
                 .where(monthEq(month), socialIdEq(socialId))
-                .fetchOne();
+                .fetch();
     }
 
     private BooleanExpression monthEq(Long month) {

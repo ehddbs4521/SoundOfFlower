@@ -6,6 +6,8 @@ import midas.SoundOfFlower.dto.response.DiaryInfoResponse;
 import midas.SoundOfFlower.repository.DiaryRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -13,9 +15,9 @@ public class DiaryService {
 
     private final DiaryRepository diaryRepository;
 
-    public DiaryInfoResponse searchDiaryInfo(Long month, String socialId) {
+    public List<DiaryInfoResponse> searchDiaryInfo(Long month, String socialId) {
 
-        DiaryInfoResponse diaryInfo = diaryRepository.getDiaryInfo(month,socialId);
+        List<DiaryInfoResponse> diaryInfo = diaryRepository.getDiaryInfo(month, socialId);
 
         return diaryInfo;
     }
