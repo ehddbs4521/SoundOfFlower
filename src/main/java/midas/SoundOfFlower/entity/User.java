@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Getter
 @NoArgsConstructor
@@ -32,9 +35,8 @@ public class User {
     @Column(unique = true)
     private String socialId; // 로그인한 소셜 타입의 식별자 값
 
-    public void authorizeUser() {
-        this.role = Role.USER.getKey();
-    }
+    @OneToMany(mappedBy = "user")
+    private List<Diary> diary = new ArrayList<>();
 
     public void updateNickname(String updateNickname) {
         this.nickName = updateNickname;
