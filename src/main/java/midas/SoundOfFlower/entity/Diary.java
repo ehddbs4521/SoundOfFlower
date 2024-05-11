@@ -23,7 +23,9 @@ public class Diary {
     private String comment;
 
     @Temporal(TemporalType.DATE)
-    private LocalDateTime time;
+    private LocalDateTime date;
+
+    private String flower;
 
     private Double angry;
     private Double sad;
