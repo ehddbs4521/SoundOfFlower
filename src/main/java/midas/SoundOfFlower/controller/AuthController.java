@@ -1,13 +1,10 @@
 package midas.SoundOfFlower.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import midas.SoundOfFlower.dto.request.*;
-import midas.SoundOfFlower.jwt.dto.response.TokenResponse;
 import midas.SoundOfFlower.jwt.service.JwtService;
 import midas.SoundOfFlower.service.AuthService;
 import org.springframework.http.HttpStatus;
@@ -84,18 +81,5 @@ public class AuthController {
         SecurityContextHolder.clearContext();
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    @PostMapping("/token/reissue")
-    public ResponseEntity<Object> refresh(HttpServletRequest request, HttpServletResponse response) {
-
-        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String socialId = principal.getUsername();
-        String accessToken = jwtService.extractAccessToken(request).get();
-        String refreshToken = jwtService.extractRefreshToken(request).get();
-        TokenResponse tokenResponse = authService.validateToken(accessToken,refreshToken, socialId);
-        jwtService.setTokens(response, tokenResponse.getAccessToken(), tokenResponse.getRefreshToken());
-
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
