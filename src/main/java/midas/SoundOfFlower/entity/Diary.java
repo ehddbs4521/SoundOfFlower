@@ -22,7 +22,6 @@ public class Diary {
     @Column(length = 1000)
     private String comment;
 
-    @Temporal(TemporalType.DATE)
     private LocalDateTime date;
 
     private String flower;
@@ -48,6 +47,10 @@ public class Diary {
             this.user.getDiary().remove(this);
         }
         this.user = user;
+
+        if (user != null) {
+            user.getDiary().add(this);
+        }
     }
 
 }
