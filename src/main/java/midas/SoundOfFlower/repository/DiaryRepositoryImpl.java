@@ -21,7 +21,7 @@ public class DiaryRepositoryImpl implements SearchDiary {
     }
 
     @Override
-    public List<DiaryInfoResponse> getDiaryInfo(Long month, String socialId) {
+    public List<DiaryInfoResponse> getDiaryInfo(Long year, Long month, String socialId) {
         return queryFactory
                 .select(Projections.fields(DiaryInfoResponse.class,
                         diary.comment,
@@ -38,8 +38,17 @@ public class DiaryRepositoryImpl implements SearchDiary {
                         diary.music.likes
                 ))
                 .from(diary)
-                .where(monthEq(month), socialIdEq(socialId))
+                .where(yearEq(year), monthEq(month), socialIdEq(socialId))
                 .fetch();
+    }
+
+    private BooleanExpression yearEq(Long year) {
+
+        if (year == null) {
+            return null;
+        }
+
+        return diary.date.year().eq(year.intValue());
     }
 
     private BooleanExpression monthEq(Long month) {
