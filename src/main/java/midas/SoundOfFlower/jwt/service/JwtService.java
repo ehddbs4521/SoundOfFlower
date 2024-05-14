@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import midas.SoundOfFlower.jwt.error.TokenStatus;
 import midas.SoundOfFlower.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -65,7 +66,7 @@ public class JwtService {
 
         long now = (new Date()).getTime();
 
-        Date refreshTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
+        Date refreshTokenExpiresIn = new Date(now + REFRESH_TOKEN_EXPIRE_TIME);
 
         return  Jwts.builder().subject(REFRESH_TOKEN_SUBJECT)
                 .claim(SOCIAL_ID, socialId).expiration(refreshTokenExpiresIn)
@@ -148,8 +149,9 @@ public class JwtService {
 
     public void setTokens(HttpServletResponse response, String accessToken, String refreshToken) {
 
-        response.setHeader(accessHeader, accessToken);
-        response.setHeader(refreshHeader, refreshToken);
+        response.setHeader(accessHeader, BEARER + accessToken);
+        response.setHeader(refreshHeader, BEARER + refreshToken);
+        response.setStatus(HttpStatus.OK.value());
     }
 
 }
