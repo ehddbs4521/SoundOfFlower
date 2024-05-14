@@ -7,12 +7,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import midas.SoundOfFlower.entity.User;
 import midas.SoundOfFlower.error.CustomException;
+import midas.SoundOfFlower.jwt.dto.response.TokenResponse;
 import midas.SoundOfFlower.jwt.error.JwtErrorHandler;
 import midas.SoundOfFlower.jwt.error.TokenStatus;
 import midas.SoundOfFlower.jwt.service.JwtService;
 import midas.SoundOfFlower.redis.entity.BlackList;
 import midas.SoundOfFlower.redis.repository.BlackListRepository;
 import midas.SoundOfFlower.repository.UserRepository;
+import midas.SoundOfFlower.service.AuthService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
@@ -36,6 +38,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     private static final String LOGIN_CHECK_URL = "/login";
 
     private final JwtService jwtService;
+    private final AuthService authService;
     private final UserRepository userRepository;
     private final BlackListRepository blackListRepository;
     private final JwtErrorHandler jwtErrorHandler;
@@ -48,12 +51,13 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             AntPathMatcher pathMatcher = new AntPathMatcher();
             String requestURI = request.getRequestURI();
 
-            if (requestURI.equals(LOGIN_CHECK_URL) || pathMatcher.match("/auth/**", requestURI)) {
+            if (requestURI.equals(LOGIN_CHECK_URL) || pathMatcher.match("/auth/**", requestURI)|| pathMatcher.match("/diary/test/**", requestURI)) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
             Optional<String> accessToken = jwtService.extractAccessToken(request);
+            Optional<String> refreshToken = jwtService.extractRefreshToken(request);
 
             if (accessToken.isEmpty()) {
                 throw new CustomException(NOT_VALID_ACCESSTOKEN);
@@ -66,8 +70,16 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                 return;
             }
 
-            jwtErrorHandler.tokenError(tokenStatus);
+            if (tokenStatus.equals(TokenStatus.EXPIRED) && pathMatcher.match("/token/reissue", requestURI)) {
 
+                String socialId = request.getHeader("socialId");
+
+                TokenResponse tokenResponse = authService.validateToken(accessToken.get(), refreshToken.get(), socialId);
+
+                jwtService.setTokens(response, tokenResponse.getAccessToken(), tokenResponse.getRefreshToken());
+            } else {
+                jwtErrorHandler.tokenError(tokenStatus);
+            }
         } catch (CustomException e) {
             sendJsonError(response, e.getErrorCode().getStatus().value(), e.getErrorCode().getCode());
         }
