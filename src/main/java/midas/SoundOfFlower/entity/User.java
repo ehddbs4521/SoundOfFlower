@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,5 +56,13 @@ public class User {
         this.socialId = socialId;
         this.imageUrl = url;
         this.socialType = socialType;
+    }
+
+    public Diary findDiaryByDate(Long year, Long month, Long day) {
+        LocalDate targetDate = LocalDate.of(year.intValue(), month.intValue(), day.intValue());
+        return diary.stream()
+                .filter(d -> d.getDate().toLocalDate().isEqual(targetDate))
+                .findFirst()
+                .orElse(null);
     }
 }

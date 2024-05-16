@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DiaryInfoResponse {
 
-    private String comment;
     private String flower;
 
     private Double angry;

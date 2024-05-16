@@ -17,6 +17,7 @@ import midas.SoundOfFlower.oauth.service.CustomOAuth2UserService;
 import midas.SoundOfFlower.redis.repository.BlackListRepository;
 import midas.SoundOfFlower.redis.repository.RefreshTokenRepository;
 import midas.SoundOfFlower.repository.UserRepository;
+import midas.SoundOfFlower.service.AuthService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -40,6 +41,7 @@ public class SecurityConfig {
 
     private final LoginService loginService;
     private final JwtService jwtService;
+    private final AuthService authService;
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final BlackListRepository blackListRepository;
@@ -64,7 +66,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/auth/**","/profile","/diary/test/**").permitAll()
+                        .requestMatchers("/auth/**","/profile").permitAll()
                         .anyRequest().authenticated());
         http
                 .oauth2Login((oauth2) -> oauth2
@@ -111,7 +113,7 @@ public class SecurityConfig {
 
     @Bean
     public Filter jwtAuthenticationProcessingFilter() {
-        JwtAuthenticationProcessingFilter jwtAuthenticationFilter = new JwtAuthenticationProcessingFilter(jwtService, userRepository, blackListRepository, jwtErrorHandler);
+        JwtAuthenticationProcessingFilter jwtAuthenticationFilter = new JwtAuthenticationProcessingFilter(jwtService,authService, userRepository, blackListRepository, jwtErrorHandler);
         return jwtAuthenticationFilter;
     }
 
