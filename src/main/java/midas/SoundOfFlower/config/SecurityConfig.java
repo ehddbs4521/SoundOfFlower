@@ -16,7 +16,7 @@ import midas.SoundOfFlower.oauth.handler.OAuth2LoginSuccessHandler;
 import midas.SoundOfFlower.oauth.service.CustomOAuth2UserService;
 import midas.SoundOfFlower.redis.repository.BlackListRepository;
 import midas.SoundOfFlower.redis.repository.RefreshTokenRepository;
-import midas.SoundOfFlower.repository.UserRepository;
+import midas.SoundOfFlower.repository.user.UserRepository;
 import midas.SoundOfFlower.service.AuthService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

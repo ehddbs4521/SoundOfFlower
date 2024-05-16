@@ -1,4 +1,4 @@
-package midas.SoundOfFlower.repository;
+package midas.SoundOfFlower.repository.diary;
 
 import midas.SoundOfFlower.dto.response.DiaryInfoResponse;
 

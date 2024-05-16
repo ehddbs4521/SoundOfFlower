@@ -13,7 +13,7 @@ import midas.SoundOfFlower.jwt.error.TokenStatus;
 import midas.SoundOfFlower.jwt.service.JwtService;
 import midas.SoundOfFlower.redis.entity.BlackList;
 import midas.SoundOfFlower.redis.repository.BlackListRepository;
-import midas.SoundOfFlower.repository.UserRepository;
+import midas.SoundOfFlower.repository.user.UserRepository;
 import midas.SoundOfFlower.service.AuthService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

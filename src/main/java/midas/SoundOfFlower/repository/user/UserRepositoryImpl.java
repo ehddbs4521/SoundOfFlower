@@ -1,4 +1,4 @@
-package midas.SoundOfFlower.repository;
+package midas.SoundOfFlower.repository.user;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

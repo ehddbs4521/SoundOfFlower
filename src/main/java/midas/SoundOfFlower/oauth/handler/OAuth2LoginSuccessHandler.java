@@ -13,7 +13,7 @@ import midas.SoundOfFlower.jwt.service.JwtService;
 import midas.SoundOfFlower.oauth.dto.CustomOAuth2User;
 import midas.SoundOfFlower.redis.entity.RefreshToken;
 import midas.SoundOfFlower.redis.repository.RefreshTokenRepository;
-import midas.SoundOfFlower.repository.UserRepository;
+import midas.SoundOfFlower.repository.user.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
