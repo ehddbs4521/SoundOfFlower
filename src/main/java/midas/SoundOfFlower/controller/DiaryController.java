@@ -43,5 +43,17 @@ public class DiaryController {
         return ResponseEntity.ok(diaryInfoResponse);
     }
 
+    @PutMapping("/calendar")
+    public ResponseEntity<Object> modifyDiary(@RequestParam Long year,
+                                             @RequestParam Long month,
+                                             @RequestParam Long day,
+                                             @RequestBody WriteDiaryRequest writeDiaryRequest) {
 
+        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String socialId = principal.getUsername();
+
+        DiaryInfoResponse diaryInfoResponse = diaryService.modifyDiary(year, month, day, socialId, writeDiaryRequest);
+
+        return ResponseEntity.ok(diaryInfoResponse);
+    }
 }
