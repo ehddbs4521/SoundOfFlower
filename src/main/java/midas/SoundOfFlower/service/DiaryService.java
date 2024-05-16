@@ -8,9 +8,9 @@ import midas.SoundOfFlower.entity.Diary;
 import midas.SoundOfFlower.entity.Music;
 import midas.SoundOfFlower.entity.User;
 import midas.SoundOfFlower.error.CustomException;
-import midas.SoundOfFlower.repository.DiaryRepository;
-import midas.SoundOfFlower.repository.MusicRepository;
-import midas.SoundOfFlower.repository.UserRepository;
+import midas.SoundOfFlower.repository.diary.DiaryRepository;
+import midas.SoundOfFlower.repository.music.MusicRepository;
+import midas.SoundOfFlower.repository.user.UserRepository;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -122,5 +122,11 @@ public class DiaryService {
         DiaryInfoResponse updatedDiaryInfo = diary.toDiaryInfoResponse();
 
         return updatedDiaryInfo;
+    }
+
+    public void deleteDiary(Long year, Long month, Long day, String socialId) {
+
+        diaryRepository.deleteDiary(year, month, day, socialId);
+
     }
 }

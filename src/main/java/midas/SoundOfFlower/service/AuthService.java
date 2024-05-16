@@ -22,7 +22,7 @@ import midas.SoundOfFlower.redis.entity.RefreshToken;
 import midas.SoundOfFlower.redis.repository.BlackListRepository;
 import midas.SoundOfFlower.redis.repository.EmailAuthenticationRepository;
 import midas.SoundOfFlower.redis.repository.RefreshTokenRepository;
-import midas.SoundOfFlower.repository.UserRepository;
+import midas.SoundOfFlower.repository.user.UserRepository;
 import midas.SoundOfFlower.util.EmailUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;

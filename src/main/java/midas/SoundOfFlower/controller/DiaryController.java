@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import midas.SoundOfFlower.dto.request.WriteDiaryRequest;
 import midas.SoundOfFlower.dto.response.DiaryInfoResponse;
 import midas.SoundOfFlower.service.DiaryService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -55,5 +56,18 @@ public class DiaryController {
         DiaryInfoResponse diaryInfoResponse = diaryService.modifyDiary(year, month, day, socialId, writeDiaryRequest);
 
         return ResponseEntity.ok(diaryInfoResponse);
+    }
+
+    @DeleteMapping("/calendar")
+    public ResponseEntity<Object> deleteDiary(@RequestParam Long year,
+                                              @RequestParam Long month,
+                                              @RequestParam Long day) {
+
+        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String socialId = principal.getUsername();
+
+        diaryService.deleteDiary(year, month, day, socialId);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

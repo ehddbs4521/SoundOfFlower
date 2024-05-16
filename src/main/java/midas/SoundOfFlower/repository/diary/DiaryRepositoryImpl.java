@@ -1,4 +1,4 @@
-package midas.SoundOfFlower.repository;
+package midas.SoundOfFlower.repository.diary;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -11,7 +11,7 @@ import java.util.List;
 import static midas.SoundOfFlower.entity.QDiary.diary;
 import static org.springframework.util.StringUtils.isEmpty;
 
-public class DiaryRepositoryImpl implements SearchDiary {
+public class DiaryRepositoryImpl implements SearchDiary,DeleteDiary{
     private final EntityManager em;
     private final JPAQueryFactory queryFactory;
 
@@ -42,6 +42,19 @@ public class DiaryRepositoryImpl implements SearchDiary {
                 .fetch();
     }
 
+    @Override
+    public void deleteDiary(Long year, Long month, Long day, String socialId) {
+
+        queryFactory
+                .delete(diary)
+                .where(yearEq(year), monthEq(month), dayEq(day), socialIdEq(socialId))
+                .execute();
+
+        em.flush();
+        em.clear();
+
+    }
+
     private BooleanExpression yearEq(Long year) {
 
         if (year == null) {
@@ -58,6 +71,15 @@ public class DiaryRepositoryImpl implements SearchDiary {
         }
 
         return diary.date.month().eq(month.intValue());
+    }
+
+    private BooleanExpression dayEq(Long day) {
+
+        if (day == null) {
+            return null;
+        }
+
+        return diary.date.dayOfMonth().eq(day.intValue());
     }
 
     private BooleanExpression socialIdEq(String socialId) {

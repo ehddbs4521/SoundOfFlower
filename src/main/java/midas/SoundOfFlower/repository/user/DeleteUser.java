@@ -1,4 +1,4 @@
-package midas.SoundOfFlower.repository;
+package midas.SoundOfFlower.repository.user;
 
 public interface DeleteUser {
 

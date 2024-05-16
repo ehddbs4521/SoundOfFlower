@@ -4,7 +4,7 @@ package midas.SoundOfFlower.login.service;
 import lombok.RequiredArgsConstructor;
 import midas.SoundOfFlower.entity.User;
 import midas.SoundOfFlower.error.CustomException;
-import midas.SoundOfFlower.repository.UserRepository;
+import midas.SoundOfFlower.repository.user.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

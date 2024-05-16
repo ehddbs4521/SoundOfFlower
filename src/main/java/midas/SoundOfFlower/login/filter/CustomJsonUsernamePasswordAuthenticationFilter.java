@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import midas.SoundOfFlower.entity.User;
 import midas.SoundOfFlower.error.CustomException;
-import midas.SoundOfFlower.repository.UserRepository;
+import midas.SoundOfFlower.repository.user.UserRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;

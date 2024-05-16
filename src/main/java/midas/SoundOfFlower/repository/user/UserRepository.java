@@ -1,4 +1,4 @@
-package midas.SoundOfFlower.repository;
+package midas.SoundOfFlower.repository.user;
 
 import midas.SoundOfFlower.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;

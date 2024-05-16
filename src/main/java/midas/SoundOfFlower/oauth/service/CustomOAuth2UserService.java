@@ -7,7 +7,7 @@ import midas.SoundOfFlower.entity.User;
 import midas.SoundOfFlower.oauth.dto.CustomOAuth2User;
 import midas.SoundOfFlower.oauth.dto.OAuthAttributes;
 import midas.SoundOfFlower.oauth.dto.SocialType;
-import midas.SoundOfFlower.repository.UserRepository;
+import midas.SoundOfFlower.repository.user.UserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
