@@ -5,10 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import midas.SoundOfFlower.dto.request.WriteDiaryRequest;
 import midas.SoundOfFlower.dto.response.DiaryInfoResponse;
 import midas.SoundOfFlower.entity.Diary;
+import midas.SoundOfFlower.entity.DiaryImage;
 import midas.SoundOfFlower.entity.Music;
 import midas.SoundOfFlower.entity.User;
 import midas.SoundOfFlower.error.CustomException;
 import midas.SoundOfFlower.repository.diary.DiaryRepository;
+import midas.SoundOfFlower.repository.diaryimage.DiaryImageRepository;
 import midas.SoundOfFlower.repository.music.MusicRepository;
 import midas.SoundOfFlower.repository.user.UserRepository;
 import org.springframework.http.HttpEntity;
@@ -16,7 +18,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,37 +32,64 @@ import static midas.SoundOfFlower.error.ErrorCode.*;
 public class DiaryService {
 
     private final DiaryRepository diaryRepository;
+    private final DiaryImageRepository diaryImageRepository;
     private final UserRepository userRepository;
     private final MusicRepository musicRepository;
     private final RestTemplate restTemplate;
+    private final DiaryImageService diaryImageService;
 
     public List<DiaryInfoResponse> searchDiaryInfo(Long year, Long month, String socialId) {
-
-        List<DiaryInfoResponse> diaryInfo = diaryRepository.getDiaryInfo(year, month, socialId);
-
-        return diaryInfo;
+        return diaryRepository.getDiaryInfo(year, month, socialId);
     }
 
-    public DiaryInfoResponse writeDiary(Long year, Long month, Long day, String socialId, WriteDiaryRequest writeDiaryRequest) {
-        DiaryInfoResponse diaryInfoResponse = null;
+    public DiaryInfoResponse writeDiary(Long year, Long month, Long day, String socialId, WriteDiaryRequest writeDiaryRequest, List<MultipartFile> images) throws IOException {
+
+        DiaryInfoResponse diaryInfoResponse = analyzeEmotion(writeDiaryRequest);
+
+        LocalDateTime localDateTime = createLocalDateTime(year, month, day);
+        User user = userRepository.findBySocialId(socialId)
+                .orElseThrow(() -> new CustomException(NOT_EXIST_USER_SOCIALID));
+        Music music = musicRepository.findByMusicId(1L)
+                .orElseThrow(() -> new CustomException(NOT_EXIST_MUSIC_MUSICID));
+
+        List<String> imageUrls = diaryImageService.uploadDiaryImages(images);
+
+        diaryInfoResponse.updateImgUrl(imageUrls);
+
+        Diary diary = getDiary(writeDiaryRequest, diaryInfoResponse, localDateTime, user, music);
+        diary.setUser(user);
+
+        diaryRepository.save(diary);
+
+        for (String url : imageUrls) {
+            DiaryImage diaryImage = DiaryImage.builder().url(url).build();
+            diaryImage.setDiary(diary);
+            diaryImageRepository.save(diaryImage);
+        }
+
+
+        return diaryInfoResponse;
+    }
+
+    private DiaryInfoResponse analyzeEmotion(WriteDiaryRequest writeDiaryRequest) {
         try {
             String url = "http://localhost:8000/analyze/emotion";
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            WriteDiaryRequest request = new WriteDiaryRequest(writeDiaryRequest.getComment());
-            HttpEntity<WriteDiaryRequest> requestEntity = new HttpEntity<>(request, headers);
-            diaryInfoResponse = restTemplate.postForObject(url, requestEntity, DiaryInfoResponse.class);
+            HttpEntity<WriteDiaryRequest> requestEntity = new HttpEntity<>(writeDiaryRequest, headers);
+            return restTemplate.postForObject(url, requestEntity, DiaryInfoResponse.class);
         } catch (CustomException e) {
-
             throw new CustomException(EXTERNAL_API_FAILURE);
         }
+    }
 
-        LocalDateTime localDateTime = createLocalDateTime(year, month, day);
-        User user = userRepository.findBySocialId(socialId).orElseThrow(() -> new CustomException(NOT_EXIST_USER_SOCIALID));
+    private Diary getDiary(WriteDiaryRequest writeDiaryRequest,
+                           DiaryInfoResponse diaryInfoResponse,
+                           LocalDateTime localDateTime,
+                           User user,
+                           Music music) {
 
-        Music music = musicRepository.findByMusicId(1L).orElseThrow(() -> new CustomException(NOT_EXIST_MUSIC_MUSICID));
-
-        Diary diary = Diary.builder()
+        return Diary.builder()
                 .comment(writeDiaryRequest.getComment())
                 .date(localDateTime)
                 .flower(diaryInfoResponse.getFlower())
@@ -71,62 +102,57 @@ public class DiaryService {
                 .user(user)
                 .music(music)
                 .build();
-
-        diary.setUser(user);
-
-        diaryRepository.save(diary);
-
-        return diaryInfoResponse;
     }
-    public LocalDateTime createLocalDateTime(Long year, Long month, Long day) {
 
+    public LocalDateTime createLocalDateTime(Long year, Long month, Long day) {
         return LocalDateTime.of(year.intValue(), month.intValue(), day.intValue(), 0, 0);
     }
 
-    public DiaryInfoResponse modifyDiary(Long year, Long month, Long day, String socialId, WriteDiaryRequest writeDiaryRequest) {
-        DiaryInfoResponse diaryInfoResponse = null;
-        try {
-            String url = "http://localhost:8000/analyze/emotion";
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            WriteDiaryRequest request = new WriteDiaryRequest(writeDiaryRequest.getComment());
-            HttpEntity<WriteDiaryRequest> requestEntity = new HttpEntity<>(request, headers);
-            diaryInfoResponse = restTemplate.postForObject(url, requestEntity, DiaryInfoResponse.class);
-        } catch (CustomException e) {
+    public DiaryInfoResponse modifyDiary(Long year, Long month, Long day, String socialId, WriteDiaryRequest writeDiaryRequest, List<MultipartFile> images) throws IOException {
 
-            throw new CustomException(EXTERNAL_API_FAILURE);
-        }
-
-        User user = userRepository.findBySocialId(socialId).orElseThrow(() -> new CustomException(NOT_EXIST_USER_SOCIALID));
+        User user = userRepository.findBySocialId(socialId)
+                .orElseThrow(() -> new CustomException(NOT_EXIST_USER_SOCIALID));
 
         Diary diary = user.findDiaryByDate(year, month, day);
 
-        diary.updateComent(writeDiaryRequest.getComment());
-        diary.updateEmotion(diaryInfoResponse.getAngry(),
-                diaryInfoResponse.getSad(),
-                diaryInfoResponse.getDelight(),
-                diaryInfoResponse.getCalm(),
-                diaryInfoResponse.getEmbarrased(),
-                diaryInfoResponse.getAnxiety());
-        diary.updateFlower(diaryInfoResponse.getFlower());
+        DiaryInfoResponse diaryInfoResponse = null;
 
-        Music music = musicRepository.findByMusicId(diaryInfoResponse.getMusicId())
-                .orElseThrow(() -> new CustomException(NOT_EXIST_MUSIC_MUSICID));
+        if (writeDiaryRequest.getComment() != null) {
+            diaryInfoResponse = analyzeEmotion(writeDiaryRequest);
+            diary.updateComment(writeDiaryRequest.getComment());
+            diary.updateEmotion(diaryInfoResponse.getAngry(),
+                    diaryInfoResponse.getSad(),
+                    diaryInfoResponse.getDelight(),
+                    diaryInfoResponse.getCalm(),
+                    diaryInfoResponse.getEmbarrased(),
+                    diaryInfoResponse.getAnxiety());
+            diary.updateFlower(diaryInfoResponse.getFlower());
 
-        diary.updateMusicInfo(music);
+            Music music = musicRepository.findByMusicId(diaryInfoResponse.getMusicId())
+                    .orElseThrow(() -> new CustomException(NOT_EXIST_MUSIC_MUSICID));
 
-        diary.setUser(user);
+            diary.updateMusicInfo(music);
+            diary.setUser(user);
 
-        diaryRepository.save(diary);
+            diaryRepository.save(diary);
+        }
 
-        DiaryInfoResponse updatedDiaryInfo = diary.toDiaryInfoResponse();
+        if (images.size() != 0) {
+            List<String> imageUrls = diaryImageService.updateImageUrls(diary.getId(), images);
+            diaryInfoResponse.updateImgUrl(imageUrls);
 
-        return updatedDiaryInfo;
+            for (String url : imageUrls) {
+                DiaryImage diaryImage = DiaryImage.builder().url(url).build();
+                diaryImage.setDiary(diary);
+                diaryImageRepository.save(diaryImage);
+            }
+        }
+
+
+        return diaryInfoResponse;
     }
 
     public void deleteDiary(Long year, Long month, Long day, String socialId) {
-
         diaryRepository.deleteDiary(year, month, day, socialId);
-
     }
 }
