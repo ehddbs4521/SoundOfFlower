@@ -33,7 +33,13 @@ public enum ErrorCode {
     ILLEGAL_TOKEN(HttpStatus.BAD_REQUEST, "SAT11","JWT 토큰이 잘못되었습니다."),
 
     NOT_EXIST_MUSIC_MUSICID(HttpStatus.NOT_FOUND, "SAM1", "해당 musicId를 찾을 수 없습니다."),
-    EXTERNAL_API_FAILURE(HttpStatus.BAD_GATEWAY,"SAG1","외부 api와 통신이 불가능합니다.");
+    EXTERNAL_API_FAILURE(HttpStatus.BAD_GATEWAY,"SAG1","외부 api와 통신이 불가능합니다."),
+
+    OVER_SIZE(HttpStatus.BAD_REQUEST,"SAI1","용량은 2MB를 초과 할 수 없습니다."),
+    OVER_COUNT(HttpStatus.BAD_REQUEST,"SAI2","갯수는 9개를 초과 할 수 없습니다."),
+
+    NOT_EXIST_DIARY(HttpStatus.NOT_FOUND,"SAD1","일기를 찾을 수 없습니다.");
+
     private final HttpStatus status;
     private final String code;
     private final String message;

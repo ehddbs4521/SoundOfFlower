@@ -2,7 +2,6 @@ package midas.SoundOfFlower.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import midas.SoundOfFlower.dto.request.NickNameRequest;
 import midas.SoundOfFlower.dto.request.ValidateNickNameRequest;
 import midas.SoundOfFlower.dto.response.ModifyAttributeResponse;
@@ -21,11 +20,11 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class ModifyController {
+public class UserInfoController {
 
     private final AuthService authService;
 
-    @PostMapping("/reset/nickname")
+    @PutMapping("/reset/nickname")
     public ResponseEntity<Object> changeNickName(@RequestBody ValidateNickNameRequest validateNickNameRequest) {
 
         authService.changeNickName(validateNickNameRequest);
@@ -33,7 +32,7 @@ public class ModifyController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping("/reset/profile")
+    @PutMapping("/reset/profile")
     public ResponseEntity<Object> changeProfile(@RequestPart(value = "nickName") NickNameRequest nickNameRequest, @RequestPart(value = "file") MultipartFile multipartFile) throws IOException {
 
         String updateProfileUrl = authService.updateProfileUrl(multipartFile, nickNameRequest.getNickName());
@@ -43,12 +42,4 @@ public class ModifyController {
         return ResponseEntity.ok(profile);
     }
 
-    @GetMapping("/profile")
-    public ResponseEntity<ModifyAttributeResponse> getEmailNickName() {
-        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String socialId = principal.getUsername();
-        ModifyAttributeResponse emailNickName = authService.getEmailNickName(socialId);
-
-        return ResponseEntity.ok(emailNickName);
-    }
 }

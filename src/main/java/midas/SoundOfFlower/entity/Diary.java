@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import midas.SoundOfFlower.dto.response.DiaryInfoResponse;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -19,6 +21,7 @@ public class Diary {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "diary_id")
     private Long id;
 
     @Column(length = 1000)
@@ -43,19 +46,21 @@ public class Diary {
     @JoinColumn(name = "music_id")
     private Music music;
 
-    public void setUser(User user) {
+    @OneToMany(mappedBy = "diary", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DiaryImage> imageUrls = new ArrayList<>();
 
+    public void setUser(User user) {
         if (this.user != null) {
             this.user.getDiary().remove(this);
         }
-        this.user = user;
 
+        this.user = user;
         if (user != null) {
             user.getDiary().add(this);
         }
     }
 
-    public void updateComent(String comment) {
+    public void updateComment(String comment) {
         this.comment = comment;
     }
 
@@ -76,6 +81,10 @@ public class Diary {
         this.music = music;
     }
 
+    public void setImageUrls(List<DiaryImage> imageUrls) {
+        this.imageUrls = imageUrls;
+    }
+
     public DiaryInfoResponse toDiaryInfoResponse() {
         return DiaryInfoResponse.builder()
                 .angry(this.angry)
@@ -85,10 +94,10 @@ public class Diary {
                 .embarrased(this.embarrased)
                 .anxiety(this.anxiety)
                 .flower(this.flower)
-                .musicId(this.music != null ? this.music.getMusicId() : null)
-                .title(this.music != null ? this.music.getTitle() : null)
-                .singer(this.music != null ? this.music.getSinger() : null)
-                .likes(this.music != null ? this.music.getLikes() : null)
+                .musicId(this.music.getMusicId())
+                .title(this.music.getTitle())
+                .singer(this.music.getSinger())
+                .likes(this.music.getLikes())
                 .build();
     }
 }

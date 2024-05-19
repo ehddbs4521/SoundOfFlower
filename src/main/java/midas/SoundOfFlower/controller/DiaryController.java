@@ -9,7 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RequestMapping("/diary")
@@ -34,26 +36,28 @@ public class DiaryController {
     public ResponseEntity<Object> writeDiary(@RequestParam Long year,
                                              @RequestParam Long month,
                                              @RequestParam Long day,
-                                             @RequestBody WriteDiaryRequest writeDiaryRequest) {
+                                             @RequestPart(value = "comment") WriteDiaryRequest writeDiaryRequest,
+                                             @RequestPart(value = "images") List<MultipartFile> images) throws IOException {
 
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String socialId = principal.getUsername();
 
-        DiaryInfoResponse diaryInfoResponse = diaryService.writeDiary(year, month, day, socialId, writeDiaryRequest);
+        DiaryInfoResponse diaryInfoResponse = diaryService.writeDiary(year, month, day, socialId, writeDiaryRequest,images);
 
         return ResponseEntity.ok(diaryInfoResponse);
     }
 
     @PutMapping("/calendar")
     public ResponseEntity<Object> modifyDiary(@RequestParam Long year,
-                                             @RequestParam Long month,
-                                             @RequestParam Long day,
-                                             @RequestBody WriteDiaryRequest writeDiaryRequest) {
+                                              @RequestParam Long month,
+                                              @RequestParam Long day,
+                                              @RequestBody WriteDiaryRequest writeDiaryRequest,
+                                              @RequestPart(value = "images") List<MultipartFile> images) throws IOException {
 
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String socialId = principal.getUsername();
 
-        DiaryInfoResponse diaryInfoResponse = diaryService.modifyDiary(year, month, day, socialId, writeDiaryRequest);
+        DiaryInfoResponse diaryInfoResponse = diaryService.modifyDiary(year, month, day, socialId, writeDiaryRequest, images);
 
         return ResponseEntity.ok(diaryInfoResponse);
     }

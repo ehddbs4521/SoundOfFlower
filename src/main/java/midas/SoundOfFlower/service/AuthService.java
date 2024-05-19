@@ -278,17 +278,4 @@ public class AuthService {
 
         return url;
     }
-
-    public ModifyAttributeResponse getEmailNickName(String socialId) {
-
-        User user = userRepository.findBySocialId(socialId).orElseThrow(() -> new CustomException(NOT_EXIST_USER_SOCIALID));
-
-        ModifyAttributeResponse modifyAttributeResponse=ModifyAttributeResponse
-                .builder()
-                .email(user.getEmail())
-                .nickName(user.getNickName())
-                .build();
-
-        return modifyAttributeResponse;
-    }
 }
