@@ -36,7 +36,7 @@ public class User {
     @Column(unique = true)
     private String socialId; // 로그인한 소셜 타입의 식별자 값
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Diary> diary = new ArrayList<>();
 
     public void updateNickname(String updateNickname) {
