@@ -2,8 +2,10 @@ package midas.SoundOfFlower.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import midas.SoundOfFlower.dto.request.DateRequest;
 import midas.SoundOfFlower.dto.request.WriteDiaryRequest;
 import midas.SoundOfFlower.dto.response.DiaryInfoResponse;
+import midas.SoundOfFlower.dto.response.StatisticalEmotionResponse;
 import midas.SoundOfFlower.entity.Diary;
 import midas.SoundOfFlower.entity.DiaryImage;
 import midas.SoundOfFlower.entity.Music;
@@ -102,6 +104,16 @@ public class DiaryService {
                 .user(user)
                 .music(music)
                 .build();
+    }
+
+    public List<StatisticalEmotionResponse> getStatisticalEmotion(DateRequest dateRequest, String socialId) {
+
+        LocalDateTime startDate = createLocalDateTime(dateRequest.getStartYear(), dateRequest.getStartMonth(), dateRequest.getStartDay());
+        LocalDateTime endDate = createLocalDateTime(dateRequest.getEndYear(), dateRequest.getEndMonth(), dateRequest.getEndDay());
+
+        List<StatisticalEmotionResponse> statisticalEmotion = diaryRepository.getStatisticalEmotion(startDate, endDate, socialId);
+
+        return statisticalEmotion;
     }
 
     public LocalDateTime createLocalDateTime(Long year, Long month, Long day) {

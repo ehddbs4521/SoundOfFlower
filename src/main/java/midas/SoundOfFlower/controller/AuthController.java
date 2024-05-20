@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @Slf4j
-@RequestMapping("/auth")
 @RestController
 @RequiredArgsConstructor
 public class AuthController {
@@ -39,7 +38,7 @@ public class AuthController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping("/resend-email")
+    @PostMapping("/auth/resend-email")
     public ResponseEntity<Object> reSendEmail(@RequestBody EmailRequest emailRequest) {
 
         authService.sendEmail(emailRequest);
