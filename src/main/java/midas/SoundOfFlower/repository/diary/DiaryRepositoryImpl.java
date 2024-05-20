@@ -5,7 +5,9 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import midas.SoundOfFlower.dto.response.DiaryInfoResponse;
+import midas.SoundOfFlower.dto.response.StatisticalEmotionResponse;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static midas.SoundOfFlower.entity.QDiary.diary;
@@ -39,6 +41,21 @@ public class DiaryRepositoryImpl implements SearchDiary,DeleteDiary{
                 ))
                 .from(diary)
                 .where(yearEq(year), monthEq(month), socialIdEq(socialId))
+                .fetch();
+    }
+
+    @Override
+    public List<StatisticalEmotionResponse> getStatisticalEmotion(LocalDateTime startDate, LocalDateTime endDate, String socialId) {
+        return queryFactory
+                .select(Projections.fields(StatisticalEmotionResponse.class,
+                        diary.angry,
+                        diary.sad,
+                        diary.delight,
+                        diary.calm,
+                        diary.embarrased,
+                        diary.anxiety))
+                .from(diary)
+                .where(diary.user.socialId.eq(socialId),diary.date.between(startDate, endDate))
                 .fetch();
     }
 
