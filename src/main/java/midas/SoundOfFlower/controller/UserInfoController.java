@@ -1,7 +1,6 @@
 package midas.SoundOfFlower.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import midas.SoundOfFlower.dto.request.DateRequest;
 import midas.SoundOfFlower.dto.request.NickNameRequest;
 import midas.SoundOfFlower.dto.request.ValidateNickNameRequest;
@@ -20,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class UserInfoController {
@@ -56,5 +54,4 @@ public class UserInfoController {
 
         return ResponseEntity.ok(statisticalEmotion);
     }
-
 }
