@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @NoArgsConstructor
 @Entity
@@ -16,8 +19,6 @@ public class Music {
 
     @Id
     private Long musicId;
-    private String title;
-    private String singer;
 
     private Double angry;
     private Double sad;
@@ -26,6 +27,12 @@ public class Music {
     private Double embarrased;
     private Double anxiety;
 
-    private Double likes;
+    private Double totalLikes;
 
+    @OneToMany(mappedBy = "music", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MusicLike> musicLikes = new ArrayList<>();
+
+    public void setLikes(Double totalLikes) {
+        this.totalLikes = totalLikes;
+    }
 }
