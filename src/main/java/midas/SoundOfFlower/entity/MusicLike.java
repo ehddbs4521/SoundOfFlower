@@ -27,7 +27,7 @@ public class MusicLike {
     @JoinColumn(name = "music_id", referencedColumnName = "music_id")
     private Music music;
 
-    private Boolean like;
+    private Boolean isLike;
 
     public void setUser(User user) {
         if (this.user != null) {
@@ -52,8 +52,8 @@ public class MusicLike {
     }
 
 
-    public void updateLike(boolean like) {
+    public void updateLike(boolean isLike) {
 
-        this.like = like;
+        this.isLike = isLike;
     }
 }

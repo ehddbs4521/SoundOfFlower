@@ -18,6 +18,7 @@ import java.util.List;
 public class Music {
 
     @Id
+    @Column(name = "music_id")
     private Long musicId;
 
     private Double angry;

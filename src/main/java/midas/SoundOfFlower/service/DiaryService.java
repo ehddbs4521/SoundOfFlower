@@ -55,7 +55,7 @@ public class DiaryService {
         LocalDateTime localDateTime = createLocalDateTime(year, month, day);
         User user = userRepository.findBySocialId(socialId)
                 .orElseThrow(() -> new CustomException(NOT_EXIST_USER_SOCIALID));
-        Music music = musicRepository.findByMusicId(1L)
+        Music music = musicRepository.findByMusicId(diaryInfoResponse.getMusicId())
                 .orElseThrow(() -> new CustomException(NOT_EXIST_MUSIC_MUSICID));
 
         List<String> imageUrls = diaryImageService.uploadDiaryImages(images);
