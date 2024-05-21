@@ -27,8 +27,9 @@ public class DiaryInfoResponse {
     private Long musicId;
     private String title;
     private String singer;
-    private Double likes;
-    private Double disLikes;
+    private Double totalLikes;
+
+    private boolean like;
 
     public void updateFlower(String flower) {
         this.flower = flower;
@@ -47,11 +48,10 @@ public class DiaryInfoResponse {
         this.anxiety = anxiety;
     }
 
-    public void updateMusicDetails(Long musicId, String title, String singer, Double likes, Double disLikes) {
+    public void updateMusicDetails(Long musicId, String title, String singer, Double totalLikes) {
         this.musicId = musicId;
         this.title = title;
         this.singer = singer;
-        this.likes = likes;
-        this.disLikes = disLikes;
+        this.totalLikes = totalLikes;
     }
 }

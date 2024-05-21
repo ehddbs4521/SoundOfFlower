@@ -46,6 +46,10 @@ public class DiaryService {
 
     public DiaryInfoResponse writeDiary(Long year, Long month, Long day, String socialId, WriteDiaryRequest writeDiaryRequest, List<MultipartFile> images) throws IOException {
 
+        if (writeDiaryRequest.getTitle() == null) {
+            throw new CustomException(NOT_EXIST_TITLE_DIARY);
+        }
+
         DiaryInfoResponse diaryInfoResponse = analyzeEmotion(writeDiaryRequest);
 
         LocalDateTime localDateTime = createLocalDateTime(year, month, day);
@@ -92,6 +96,7 @@ public class DiaryService {
                            Music music) {
 
         return Diary.builder()
+                .title(writeDiaryRequest.getTitle())
                 .comment(writeDiaryRequest.getComment())
                 .date(localDateTime)
                 .flower(diaryInfoResponse.getFlower())
@@ -128,6 +133,11 @@ public class DiaryService {
         Diary diary = user.findDiaryByDate(year, month, day);
 
         DiaryInfoResponse diaryInfoResponse = null;
+
+        if (writeDiaryRequest.getTitle() != null) {
+            diary.updateTitle(writeDiaryRequest.getTitle());
+            diaryRepository.save(diary);
+        }
 
         if (writeDiaryRequest.getComment() != null) {
             diaryInfoResponse = analyzeEmotion(writeDiaryRequest);

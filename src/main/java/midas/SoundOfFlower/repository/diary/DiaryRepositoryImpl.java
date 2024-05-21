@@ -35,9 +35,9 @@ public class DiaryRepositoryImpl implements SearchDiary,DeleteDiary{
                         diary.embarrased,
                         diary.anxiety,
                         diary.music.musicId,
-                        diary.music.title,
-                        diary.music.singer,
-                        diary.music.likes
+                        diary.music.totalLikes,
+                        diary.musicLike,
+                        diary.musicDisLike
                 ))
                 .from(diary)
                 .where(yearEq(year), monthEq(month), socialIdEq(socialId))

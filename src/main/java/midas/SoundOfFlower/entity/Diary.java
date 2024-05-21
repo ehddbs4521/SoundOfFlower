@@ -24,6 +24,8 @@ public class Diary {
     @Column(name = "diary_id")
     private Long id;
 
+    private String title;
+
     @Column(length = 1000)
     private String comment;
 
@@ -37,6 +39,9 @@ public class Diary {
     private Double calm;
     private Double embarrased;
     private Double anxiety;
+
+    private Boolean musicLike;
+    private Boolean musicDisLike;
 
     @ManyToOne
     @JoinColumn(name = "social_id", referencedColumnName = "socialId")
@@ -58,6 +63,10 @@ public class Diary {
         if (user != null) {
             user.getDiary().add(this);
         }
+    }
+
+    public void updateTitle(String title) {
+        this.title = title;
     }
 
     public void updateComment(String comment) {
@@ -95,9 +104,7 @@ public class Diary {
                 .anxiety(this.anxiety)
                 .flower(this.flower)
                 .musicId(this.music.getMusicId())
-                .title(this.music.getTitle())
-                .singer(this.music.getSinger())
-                .likes(this.music.getLikes())
+                .totalLikes(this.music.getTotalLikes())
                 .build();
     }
 }
