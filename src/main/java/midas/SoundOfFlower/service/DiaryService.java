@@ -39,6 +39,7 @@ public class DiaryService {
     private final MusicRepository musicRepository;
     private final RestTemplate restTemplate;
     private final DiaryImageService diaryImageService;
+    private final MusicLikesService musicLikesService;
 
     public List<DiaryInfoResponse> searchDiaryInfo(Long year, Long month, String socialId) {
         return diaryRepository.getDiaryInfo(year, month, socialId);
@@ -58,21 +59,27 @@ public class DiaryService {
         Music music = musicRepository.findByMusicId(diaryInfoResponse.getMusicId())
                 .orElseThrow(() -> new CustomException(NOT_EXIST_MUSIC_MUSICID));
 
-        List<String> imageUrls = diaryImageService.uploadDiaryImages(images);
-
-        diaryInfoResponse.updateImgUrl(imageUrls);
 
         Diary diary = getDiary(writeDiaryRequest, diaryInfoResponse, localDateTime, user, music);
         diary.setUser(user);
 
         diaryRepository.save(diary);
 
-        for (String url : imageUrls) {
-            DiaryImage diaryImage = DiaryImage.builder().url(url).build();
-            diaryImage.setDiary(diary);
-            diaryImageRepository.save(diaryImage);
-        }
+        List<String> imageUrls = null;
 
+        if (images != null || images.size() != 0) {
+            imageUrls = diaryImageService.uploadDiaryImages(images);
+            diaryInfoResponse.updateImgUrl(imageUrls);
+
+            for (String url : imageUrls) {
+                DiaryImage diaryImage = DiaryImage.builder().url(url).build();
+                diaryImage.setDiary(diary);
+                diaryImageRepository.save(diaryImage);
+            }
+        }
+        boolean likes = musicLikesService.isLikes(diaryInfoResponse.getMusicId(), socialId);
+
+        diaryInfoResponse.updateLike(likes);
 
         return diaryInfoResponse;
     }
@@ -147,7 +154,8 @@ public class DiaryService {
                     diaryInfoResponse.getDelight(),
                     diaryInfoResponse.getCalm(),
                     diaryInfoResponse.getEmbarrased(),
-                    diaryInfoResponse.getAnxiety());
+                    diaryInfoResponse.getAnxiety(),
+                    diaryInfoResponse.getLove());
             diary.updateFlower(diaryInfoResponse.getFlower());
 
             Music music = musicRepository.findByMusicId(diaryInfoResponse.getMusicId())
@@ -170,6 +178,9 @@ public class DiaryService {
             }
         }
 
+        boolean likes = musicLikesService.isLikes(diaryInfoResponse.getMusicId(), socialId);
+
+        diaryInfoResponse.updateLike(likes);
 
         return diaryInfoResponse;
     }

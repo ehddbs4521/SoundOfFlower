@@ -13,8 +13,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static midas.SoundOfFlower.error.ErrorCode.NOT_EXIST_MUSIC_MUSICID;
 
@@ -64,6 +66,24 @@ public class MusicLikesService {
         }
     }
 
+    public boolean isLikes(Long musicId, String socialId) {
+        String indexKey = socialId;
+        List<String> likedMusicIds = redisTemplate.opsForList().range(indexKey, 0, -1);
+
+        if (likedMusicIds != null && likedMusicIds.contains(musicId.toString())) {
+            return true;
+        } else {
+
+            return musicLikeRepository.findByUser_SocialIdAndMusic_MusicId(socialId, musicId)
+                    .map(musicLike -> {
+                        redisTemplate.opsForList().rightPush(indexKey, musicId.toString());
+                        return true;
+                    })
+                    .orElse(false);
+        }
+    }
+
+
     public PageResultResponse getLikes(String socialId, int page, int size) {
         String indexKey = socialId;
         Long total = redisTemplate.opsForList().size(indexKey);
@@ -86,7 +106,25 @@ public class MusicLikesService {
     }
 
     public Set<String> getTopLikedMusicIds(int limit) {
-        return redisTemplate.opsForZSet().reverseRange(TOTAL_LIKES, 0, limit - 1);
+        Set<String> topLikedMusicIds = redisTemplate.opsForZSet().reverseRange(TOTAL_LIKES, 0, limit - 1);
+
+        if (topLikedMusicIds == null || topLikedMusicIds.isEmpty()) {
+
+            List<Music> topLikedMusics = musicRepository.findAll().stream()
+                    .sorted(Comparator.comparingDouble(Music::getTotalLikes).reversed())
+                    .limit(limit)
+                    .collect(Collectors.toList());
+
+            for (Music music : topLikedMusics) {
+                redisTemplate.opsForZSet().add(TOTAL_LIKES, music.getMusicId().toString(), music.getTotalLikes());
+            }
+
+            topLikedMusicIds = topLikedMusics.stream()
+                    .map(music -> music.getMusicId().toString())
+                    .collect(Collectors.toSet());
+        }
+
+        return topLikedMusicIds;
     }
 
     private static void updateRedisMusicTotalLikes(boolean like, MusicTotalLikes musicTotalLikes) {
