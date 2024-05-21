@@ -39,6 +39,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Diary> diary = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MusicLike> musicLikes = new ArrayList<>();
+
     public void updateNickname(String updateNickname) {
         this.nickName = updateNickname;
     }
