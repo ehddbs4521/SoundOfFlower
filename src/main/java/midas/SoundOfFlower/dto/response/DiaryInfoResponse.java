@@ -23,9 +23,10 @@ public class DiaryInfoResponse {
     private Double calm;
     private Double embarrased;
     private Double anxiety;
+    private Double love;
 
     private Long musicId;
-    private Double totalLikes;
+    private boolean like;
 
     public void updateFlower(String flower) {
         this.flower = flower;
@@ -35,17 +36,21 @@ public class DiaryInfoResponse {
         this.imgUrl = imgUrl;
     }
 
-    public void updateEmotion(Double angry, Double sad, Double delight, Double calm, Double embarrased, Double anxiety) {
+    public void updateEmotion(Double angry, Double sad, Double delight, Double calm, Double embarrased, Double anxiety,Double love) {
         this.angry = angry;
         this.sad = sad;
         this.delight = delight;
         this.calm = calm;
         this.embarrased = embarrased;
         this.anxiety = anxiety;
+        this.love = love;
     }
 
-    public void updateMusicDetails(Long musicId, Double totalLikes) {
+    public void updateMusic(Long musicId) {
         this.musicId = musicId;
-        this.totalLikes = totalLikes;
+    }
+
+    public void updateLike(boolean like) {
+        this.like = like;
     }
 }
