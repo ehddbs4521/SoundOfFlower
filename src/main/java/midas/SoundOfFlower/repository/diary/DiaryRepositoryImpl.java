@@ -34,6 +34,7 @@ public class DiaryRepositoryImpl implements SearchDiary,DeleteDiary{
                         diary.calm,
                         diary.embarrased,
                         diary.anxiety,
+                        diary.love,
                         diary.music.musicId,
                         diary.music.totalLikes,
                         diary.musicLike,
