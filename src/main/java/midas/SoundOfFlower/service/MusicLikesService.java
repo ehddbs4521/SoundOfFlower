@@ -137,9 +137,9 @@ public class MusicLikesService {
 
     private static void updateMusicTotalLikes(boolean like, Music music) {
         if (like) {
-            music.setLikes(music.getTotalLikes() + 1);
+            music.setTotalLikes(music.getTotalLikes() + 1);
         } else if (music.getTotalLikes() > 0) {
-            music.setLikes(music.getTotalLikes() - 1);
+            music.setTotalLikes(music.getTotalLikes() - 1);
         }
     }
 

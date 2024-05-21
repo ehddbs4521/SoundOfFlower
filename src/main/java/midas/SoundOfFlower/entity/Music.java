@@ -27,13 +27,14 @@ public class Music {
     private Double calm;
     private Double embarrased;
     private Double anxiety;
+    private Double love;
 
     private Double totalLikes;
 
     @OneToMany(mappedBy = "music", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MusicLike> musicLikes = new ArrayList<>();
 
-    public void setLikes(Double totalLikes) {
+    public void setTotalLikes(Double totalLikes) {
         this.totalLikes = totalLikes;
     }
 }
