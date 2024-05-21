@@ -38,7 +38,8 @@ public enum ErrorCode {
     OVER_SIZE(HttpStatus.BAD_REQUEST,"SAI1","용량은 2MB를 초과 할 수 없습니다."),
     OVER_COUNT(HttpStatus.BAD_REQUEST,"SAI2","갯수는 9개를 초과 할 수 없습니다."),
 
-    NOT_EXIST_DIARY(HttpStatus.NOT_FOUND,"SAD1","일기를 찾을 수 없습니다.");
+    NOT_EXIST_DIARY(HttpStatus.NOT_FOUND,"SAD1","일기를 찾을 수 없습니다."),
+    NOT_EXIST_TITLE_DIARY(HttpStatus.NOT_FOUND,"SAD2","제목이 없습니다.");
 
     private final HttpStatus status;
     private final String code;
