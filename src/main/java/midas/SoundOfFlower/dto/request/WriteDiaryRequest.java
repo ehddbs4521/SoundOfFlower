@@ -11,5 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class WriteDiaryRequest {
 
+    private String title;
     private String comment;
 }
