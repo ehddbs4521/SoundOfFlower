@@ -16,9 +16,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static midas.SoundOfFlower.error.ErrorCode.*;
@@ -40,7 +38,7 @@ public class MusicLikesService {
     public void likeMusic(String spotify, String socialId, boolean like) {
         MusicLike musicLike=null;
         if (like) {
-            musicLike = musicLikeRepository.findByUser_SocialIdAndMusic_spotify(socialId, spotify)
+            musicLike = musicLikeRepository.findByUser_SocialIdAndMusic_Spotify(socialId, spotify)
                     .orElseGet(() -> {
                         Music music = musicRepository.findBySpotify(spotify)
                                 .orElseThrow(() -> new CustomException(NOT_EXIST_MUSIC_SPOTIFY));
@@ -57,7 +55,7 @@ public class MusicLikesService {
 
             musicLikeRepository.save(musicLike);
         } else {
-            musicLike = musicLikeRepository.findByUser_SocialIdAndMusic_spotify(socialId, spotify)
+            musicLike = musicLikeRepository.findByUser_SocialIdAndMusic_Spotify(socialId, spotify)
                     .orElseThrow(() -> new CustomException(NOT_EXIST_MUSIC_SPOTIFY));
             musicLike.updateLike(false);
             musicLikeRepository.save(musicLike);
@@ -95,7 +93,7 @@ public class MusicLikesService {
             return true;
         } else {
 
-            return musicLikeRepository.findByUser_SocialIdAndMusic_spotify(socialId, spotify)
+            return musicLikeRepository.findByUser_SocialIdAndMusic_Spotify(socialId, spotify)
                     .map(musicLike -> {
                         redisTemplate.opsForList().rightPush(indexKey, spotify.toString());
                         return true;
@@ -109,9 +107,9 @@ public class MusicLikesService {
         String indexKey = socialId;
         Long total = redisTemplate.opsForList().size(indexKey);
         if (total == null || total == 0) {
-            List<MusicLike> musicLikes = musicLikeRepository.findByUser_SocialId(socialId);
+            List<MusicLike> musicLikes = musicLikeRepository.findByUser_SocialIdAndIsLikeTrue(socialId);
             for (MusicLike musicLike : musicLikes) {
-                redisTemplate.opsForList().leftPush(indexKey, musicLike.getMusic().getSpotify().toString());
+                redisTemplate.opsForList().leftPush(indexKey, musicLike.getMusic().getSpotify());
             }
             total = redisTemplate.opsForList().size(indexKey);
         }
@@ -125,11 +123,11 @@ public class MusicLikesService {
         return new PageResultResponse(spotifys, last);
     }
 
-    public Set<String> getTopLikedspotifys(int limit) {
+    public Map<String, Object> getTopLikedspotifys(int limit) {
         Set<String> topLikedspotifys = redisTemplate.opsForZSet().reverseRange(TOTAL_LIKES, 0, limit - 1);
+        Map<String, Object> resultMap = new HashMap<>();
 
         if (topLikedspotifys == null || topLikedspotifys.isEmpty()) {
-
             List<Music> topLikedMusics = musicRepository.findAll().stream()
                     .sorted(Comparator.comparingDouble(Music::getTotalLikes).reversed())
                     .limit(limit)
@@ -137,15 +135,21 @@ public class MusicLikesService {
 
             for (Music music : topLikedMusics) {
                 redisTemplate.opsForZSet().add(TOTAL_LIKES, music.getSpotify().toString(), music.getTotalLikes());
+                resultMap.put(music.getSpotify().toString(), music.getTotalLikes());
             }
 
-            topLikedspotifys = topLikedMusics.stream()
-                    .map(music -> music.getSpotify().toString())
-                    .collect(Collectors.toSet());
+        } else {
+            for (String spotifyId : topLikedspotifys) {
+                Double score = redisTemplate.opsForZSet().score(TOTAL_LIKES, spotifyId);
+                if (score != null) {
+                    resultMap.put(spotifyId, score);
+                }
+            }
         }
 
-        return topLikedspotifys;
+        return resultMap;
     }
+
 
     private static void updateRedisMusicTotalLikes(boolean like, MusicTotalLikes musicTotalLikes) {
         if (like) {

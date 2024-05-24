@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Set;
 
 @RequestMapping("/music")
@@ -52,9 +53,9 @@ public class MusicController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/top-liked")
+    @GetMapping("/top10")
     public ResponseEntity<Object> getTopLikedspotifys(@RequestParam(defaultValue = "10") int limit) {
-        Set<String> topLikedspotifys = musicLikesService.getTopLikedspotifys(limit);
+        Map<String, Object> topLikedspotifys = musicLikesService.getTopLikedspotifys(limit);
         return ResponseEntity.ok(topLikedspotifys);
     }
 }

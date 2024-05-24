@@ -111,12 +111,15 @@ public class DiaryRepositoryImpl implements SearchDiary, DeleteDiary {
     public List<StatisticalEmotionResponse> getStatisticalEmotion(LocalDate startDate, LocalDate endDate, String socialId) {
         return queryFactory
                 .select(Projections.fields(StatisticalEmotionResponse.class,
+                        diary.date,
                         diary.angry,
                         diary.sad,
                         diary.delight,
                         diary.calm,
                         diary.embarrased,
-                        diary.anxiety))
+                        diary.anxiety,
+                        diary.love
+                ))
                 .from(diary)
                 .where(diary.user.socialId.eq(socialId), diary.date.between(startDate, endDate))
                 .fetch();

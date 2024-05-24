@@ -2,7 +2,6 @@ package midas.SoundOfFlower.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import midas.SoundOfFlower.dto.request.DateRequest;
 import midas.SoundOfFlower.dto.request.WriteDiaryRequest;
 import midas.SoundOfFlower.dto.response.DiaryInfoResponse;
 import midas.SoundOfFlower.dto.response.StatisticalEmotionResponse;
@@ -126,10 +125,10 @@ public class DiaryService {
                 .build();
     }
 
-    public List<StatisticalEmotionResponse> getStatisticalEmotion(DateRequest dateRequest, String socialId) {
+    public List<StatisticalEmotionResponse> getStatisticalEmotion(Long startYear, Long startMonth, Long startDay, Long endYear, Long endMonth, Long endDay, String socialId) {
 
-        LocalDate startDate = createLocalDate(dateRequest.getStartYear(), dateRequest.getStartMonth(), dateRequest.getStartDay());
-        LocalDate endDate = createLocalDate(dateRequest.getEndYear(), dateRequest.getEndMonth(), dateRequest.getEndDay());
+        LocalDate startDate = createLocalDate(startYear, startMonth, startDay);
+        LocalDate endDate = createLocalDate(endYear, endMonth, endDay);
 
         List<StatisticalEmotionResponse> statisticalEmotion = diaryRepository.getStatisticalEmotion(startDate, endDate, socialId);
 

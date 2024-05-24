@@ -1,7 +1,6 @@
 package midas.SoundOfFlower.controller;
 
 import lombok.RequiredArgsConstructor;
-import midas.SoundOfFlower.dto.request.DateRequest;
 import midas.SoundOfFlower.dto.request.NickNameRequest;
 import midas.SoundOfFlower.dto.request.ValidateNickNameRequest;
 import midas.SoundOfFlower.dto.response.StatisticalEmotionResponse;
@@ -45,12 +44,17 @@ public class UserInfoController {
     }
 
     @GetMapping("/statistic/emotion")
-    public ResponseEntity<Object> getStatisticalEmotion(@RequestBody DateRequest dateRequest) {
+    public ResponseEntity<Object> getStatisticalEmotion(@RequestParam Long startYear,
+                                                        @RequestParam Long startMonth,
+                                                        @RequestParam Long startDay,
+                                                        @RequestParam Long endYear,
+                                                        @RequestParam Long endMonth,
+                                                        @RequestParam Long endDay) {
 
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String socialId = principal.getUsername();
 
-        List<StatisticalEmotionResponse> statisticalEmotion = diaryService.getStatisticalEmotion(dateRequest, socialId);
+        List<StatisticalEmotionResponse> statisticalEmotion = diaryService.getStatisticalEmotion(startYear, startMonth, startDay, endYear, endMonth, endDay, socialId);
 
         return ResponseEntity.ok(statisticalEmotion);
     }

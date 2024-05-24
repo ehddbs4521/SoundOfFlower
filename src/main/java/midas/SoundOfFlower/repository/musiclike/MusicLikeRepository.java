@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface MusicLikeRepository extends JpaRepository<MusicLike, Long> {
 
-    Optional<MusicLike> findByUser_SocialIdAndMusic_spotify(String socialId, String spotify);
-    List<MusicLike> findByUser_SocialId(String socialId);
+    Optional<MusicLike> findByUser_SocialIdAndMusic_Spotify(String socialId, String spotify);
+    List<MusicLike> findByUser_SocialIdAndIsLikeTrue(String socialId);
 
 }
