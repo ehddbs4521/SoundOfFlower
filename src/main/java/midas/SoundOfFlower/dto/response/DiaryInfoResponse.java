@@ -13,6 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 public class DiaryInfoResponse {
 
+    private Long diaryId;
+
     private String flower;
 
     private List<String> imgUrl;
@@ -25,8 +27,9 @@ public class DiaryInfoResponse {
     private Double anxiety;
     private Double love;
 
-    private Long musicId;
-    private boolean like;
+    private String spotify;
+
+    private boolean isLike;
 
     public void updateFlower(String flower) {
         this.flower = flower;
@@ -46,11 +49,15 @@ public class DiaryInfoResponse {
         this.love = love;
     }
 
-    public void updateMusic(Long musicId) {
-        this.musicId = musicId;
+    public void updateMusic(String spotify) {
+        this.spotify = spotify;
     }
 
-    public void updateLike(boolean like) {
-        this.like = like;
+    public void updateLike(boolean isLike) {
+        this.isLike = isLike;
+    }
+
+    public void setImgUrl(List<String> imgUrl) {
+        this.imgUrl = imgUrl;
     }
 }

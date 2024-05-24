@@ -21,13 +21,24 @@ public class DiaryController {
 
     private final DiaryService diaryService;
 
-    @GetMapping("/calendar")
-    public ResponseEntity<Object> calendalInfo(@RequestParam Long year, @RequestParam Long month) {
+    @GetMapping("/calendar/month")
+    public ResponseEntity<Object> calendarMonthInfo(@RequestParam Long year, @RequestParam Long month) {
 
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String socialId = principal.getUsername();
 
-        List<DiaryInfoResponse> diaryInfoResponses = diaryService.searchDiaryInfo(year, month, socialId);
+        List<DiaryInfoResponse> diaryInfoResponses = diaryService.searchMonthDiaryInfo(year, month, socialId);
+
+        return ResponseEntity.ok(diaryInfoResponses);
+    }
+
+    @GetMapping("/calendar/day")
+    public ResponseEntity<Object> calendarDayInfo(@RequestParam Long year, @RequestParam Long month ,@RequestParam Long day) {
+
+        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String socialId = principal.getUsername();
+
+        DiaryInfoResponse diaryInfoResponses = diaryService.searchDayDiaryInfo(year, month, day,socialId);
 
         return ResponseEntity.ok(diaryInfoResponses);
     }
@@ -52,11 +63,10 @@ public class DiaryController {
                                               @RequestParam Long month,
                                               @RequestParam Long day,
                                               @RequestPart(value = "comment") WriteDiaryRequest writeDiaryRequest,
-                                              @RequestPart(value = "images") List<MultipartFile> images) throws IOException {
+                                              @RequestPart(value = "images",required = false) List<MultipartFile> images) throws IOException {
 
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String socialId = principal.getUsername();
-
         DiaryInfoResponse diaryInfoResponse = diaryService.modifyDiary(year, month, day, socialId, writeDiaryRequest, images);
 
         return ResponseEntity.ok(diaryInfoResponse);

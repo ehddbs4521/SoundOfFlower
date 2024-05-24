@@ -5,9 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import midas.SoundOfFlower.dto.response.DiaryInfoResponse;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +28,8 @@ public class Diary {
     @Column(length = 1000)
     private String comment;
 
-    private LocalDateTime date;
+    @Column(unique = true)
+    private LocalDate date;
 
     private String flower;
 
@@ -41,15 +41,13 @@ public class Diary {
     private Double anxiety;
     private Double love;
 
-    private Boolean musicLike;
-    private Boolean musicDisLike;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "social_id", referencedColumnName = "socialId")
     private User user;
 
-    @OneToOne
-    @JoinColumn(name = "music_id")
+    @ManyToOne
+    @JoinColumn(name = "spotify", referencedColumnName = "spotify")
     private Music music;
 
     @OneToMany(mappedBy = "diary", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -63,6 +61,17 @@ public class Diary {
         this.user = user;
         if (user != null) {
             user.getDiary().add(this);
+        }
+    }
+
+    public void setMusic(Music music) {
+        if (this.music != null) {
+            this.music.getDiary().remove(this);
+        }
+
+        this.music = music;
+        if (music != null) {
+            music.getDiary().add(this);
         }
     }
 
@@ -86,10 +95,6 @@ public class Diary {
 
     public void updateFlower(String flower) {
         this.flower = flower;
-    }
-
-    public void updateMusicInfo(Music music) {
-        this.music = music;
     }
 
     public void setImageUrls(List<DiaryImage> imageUrls) {

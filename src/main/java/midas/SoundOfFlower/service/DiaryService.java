@@ -19,12 +19,15 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static midas.SoundOfFlower.error.ErrorCode.*;
 
@@ -41,8 +44,12 @@ public class DiaryService {
     private final DiaryImageService diaryImageService;
     private final MusicLikesService musicLikesService;
 
-    public List<DiaryInfoResponse> searchDiaryInfo(Long year, Long month, String socialId) {
-        return diaryRepository.getDiaryInfo(year, month, socialId);
+    public List<DiaryInfoResponse> searchMonthDiaryInfo(Long year, Long month, String socialId) {
+        return diaryRepository.getMonthDiaryInfo(year, month, socialId);
+    }
+
+    public DiaryInfoResponse searchDayDiaryInfo(Long year, Long month, Long day, String socialId) {
+        return diaryRepository.getDayDiaryInfo(year, month, day, socialId);
     }
 
     public DiaryInfoResponse writeDiary(Long year, Long month, Long day, String socialId, WriteDiaryRequest writeDiaryRequest, List<MultipartFile> images) throws IOException {
@@ -51,16 +58,15 @@ public class DiaryService {
             throw new CustomException(NOT_EXIST_TITLE_DIARY);
         }
 
-        DiaryInfoResponse diaryInfoResponse = analyzeEmotion(writeDiaryRequest);
-
-        LocalDateTime localDateTime = createLocalDateTime(year, month, day);
+        DiaryInfoResponse diaryInfoResponse = analyzeEmotion(writeDiaryRequest.getComment());
+        LocalDate LocalDate = createLocalDate(year, month, day);
         User user = userRepository.findBySocialId(socialId)
                 .orElseThrow(() -> new CustomException(NOT_EXIST_USER_SOCIALID));
-        Music music = musicRepository.findByMusicId(diaryInfoResponse.getMusicId())
-                .orElseThrow(() -> new CustomException(NOT_EXIST_MUSIC_MUSICID));
+        Music music = musicRepository.findBySpotify(diaryInfoResponse.getSpotify())
+                .orElseThrow(() -> new CustomException(NOT_EXIST_MUSIC_SPOTIFY));
 
 
-        Diary diary = getDiary(writeDiaryRequest, diaryInfoResponse, localDateTime, user, music);
+        Diary diary = getDiary(writeDiaryRequest, diaryInfoResponse, LocalDate, user, music);
         diary.setUser(user);
 
         diaryRepository.save(diary);
@@ -77,35 +83,36 @@ public class DiaryService {
                 diaryImageRepository.save(diaryImage);
             }
         }
-        boolean likes = musicLikesService.isLikes(diaryInfoResponse.getMusicId(), socialId);
-
-        diaryInfoResponse.updateLike(likes);
 
         return diaryInfoResponse;
     }
 
-    private DiaryInfoResponse analyzeEmotion(WriteDiaryRequest writeDiaryRequest) {
+    private DiaryInfoResponse analyzeEmotion(String comment) {
         try {
             String url = "http://localhost:8000/analyze/emotion";
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<WriteDiaryRequest> requestEntity = new HttpEntity<>(writeDiaryRequest, headers);
+
+            Map<String, String> requestMap = new HashMap<>();
+            requestMap.put("comment", comment);
+
+            HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(requestMap, headers);
             return restTemplate.postForObject(url, requestEntity, DiaryInfoResponse.class);
-        } catch (CustomException e) {
+        } catch (Exception e) {
             throw new CustomException(EXTERNAL_API_FAILURE);
         }
     }
 
     private Diary getDiary(WriteDiaryRequest writeDiaryRequest,
                            DiaryInfoResponse diaryInfoResponse,
-                           LocalDateTime localDateTime,
+                           LocalDate LocalDate,
                            User user,
                            Music music) {
 
         return Diary.builder()
                 .title(writeDiaryRequest.getTitle())
                 .comment(writeDiaryRequest.getComment())
-                .date(localDateTime)
+                .date(LocalDate)
                 .flower(diaryInfoResponse.getFlower())
                 .angry(diaryInfoResponse.getAngry())
                 .sad(diaryInfoResponse.getSad())
@@ -113,6 +120,7 @@ public class DiaryService {
                 .calm(diaryInfoResponse.getCalm())
                 .embarrased(diaryInfoResponse.getEmbarrased())
                 .anxiety(diaryInfoResponse.getAnxiety())
+                .love(diaryInfoResponse.getLove())
                 .user(user)
                 .music(music)
                 .build();
@@ -120,25 +128,25 @@ public class DiaryService {
 
     public List<StatisticalEmotionResponse> getStatisticalEmotion(DateRequest dateRequest, String socialId) {
 
-        LocalDateTime startDate = createLocalDateTime(dateRequest.getStartYear(), dateRequest.getStartMonth(), dateRequest.getStartDay());
-        LocalDateTime endDate = createLocalDateTime(dateRequest.getEndYear(), dateRequest.getEndMonth(), dateRequest.getEndDay());
+        LocalDate startDate = createLocalDate(dateRequest.getStartYear(), dateRequest.getStartMonth(), dateRequest.getStartDay());
+        LocalDate endDate = createLocalDate(dateRequest.getEndYear(), dateRequest.getEndMonth(), dateRequest.getEndDay());
 
         List<StatisticalEmotionResponse> statisticalEmotion = diaryRepository.getStatisticalEmotion(startDate, endDate, socialId);
 
         return statisticalEmotion;
     }
 
-    public LocalDateTime createLocalDateTime(Long year, Long month, Long day) {
-        return LocalDateTime.of(year.intValue(), month.intValue(), day.intValue(), 0, 0);
+    public LocalDate createLocalDate(Long year, Long month, Long day) {
+        return LocalDate.of(year.intValue(), month.intValue(), day.intValue());
     }
 
+    @Transactional
     public DiaryInfoResponse modifyDiary(Long year, Long month, Long day, String socialId, WriteDiaryRequest writeDiaryRequest, List<MultipartFile> images) throws IOException {
 
         User user = userRepository.findBySocialId(socialId)
                 .orElseThrow(() -> new CustomException(NOT_EXIST_USER_SOCIALID));
 
         Diary diary = user.findDiaryByDate(year, month, day);
-
         DiaryInfoResponse diaryInfoResponse = null;
 
         if (writeDiaryRequest.getTitle() != null) {
@@ -147,7 +155,7 @@ public class DiaryService {
         }
 
         if (writeDiaryRequest.getComment() != null) {
-            diaryInfoResponse = analyzeEmotion(writeDiaryRequest);
+            diaryInfoResponse = analyzeEmotion(writeDiaryRequest.getComment());
             diary.updateComment(writeDiaryRequest.getComment());
             diary.updateEmotion(diaryInfoResponse.getAngry(),
                     diaryInfoResponse.getSad(),
@@ -158,17 +166,18 @@ public class DiaryService {
                     diaryInfoResponse.getLove());
             diary.updateFlower(diaryInfoResponse.getFlower());
 
-            Music music = musicRepository.findByMusicId(diaryInfoResponse.getMusicId())
-                    .orElseThrow(() -> new CustomException(NOT_EXIST_MUSIC_MUSICID));
-
-            diary.updateMusicInfo(music);
+            Music music = musicRepository.findBySpotify(diaryInfoResponse.getSpotify())
+                    .orElseThrow(() -> new CustomException(NOT_EXIST_MUSIC_SPOTIFY));
+            diary.setMusic(music);
             diary.setUser(user);
 
             diaryRepository.save(diary);
         }
 
-        if (images.size() != 0) {
-            List<String> imageUrls = diaryImageService.updateImageUrls(diary.getId(), images);
+        if (images != null) {
+            List<DiaryImage> diaryImages = diary.getImageUrls();
+            diary.getImageUrls().clear();
+            List<String> imageUrls = diaryImageService.updateImageUrls(diaryImages, images);
             diaryInfoResponse.updateImgUrl(imageUrls);
 
             for (String url : imageUrls) {
@@ -177,10 +186,13 @@ public class DiaryService {
                 diaryImageRepository.save(diaryImage);
             }
         }
+        if (diaryInfoResponse != null) {
 
-        boolean likes = musicLikesService.isLikes(diaryInfoResponse.getMusicId(), socialId);
+            boolean likes = musicLikesService.isLikes(diaryInfoResponse.getSpotify(), socialId);
+            diaryInfoResponse.updateLike(likes);
+        }
 
-        diaryInfoResponse.updateLike(likes);
+
 
         return diaryInfoResponse;
     }
