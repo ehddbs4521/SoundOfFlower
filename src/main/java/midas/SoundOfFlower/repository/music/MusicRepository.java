@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface MusicRepository extends JpaRepository<Music, Long> {
+public interface MusicRepository extends JpaRepository<Music, String> {
 
-    Optional<Music> findByMusicId(Long musicId);
+    Optional<Music> findBySpotify(String spotify);
 }

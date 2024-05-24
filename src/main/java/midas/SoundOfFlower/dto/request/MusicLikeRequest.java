@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MusicLikeRequest {
 
-    private Long musicId;
+    private String spotify;
     private boolean like;
 }

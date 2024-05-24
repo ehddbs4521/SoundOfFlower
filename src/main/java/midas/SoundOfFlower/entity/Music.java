@@ -18,8 +18,13 @@ import java.util.List;
 public class Music {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "music_id")
-    private Long musicId;
+    private Long id;
+
+    @Column(name = "spotify", unique = true, nullable = false)
+    private String spotify;
+
 
     private Double angry;
     private Double sad;
@@ -30,6 +35,9 @@ public class Music {
     private Double love;
 
     private Double totalLikes;
+
+    @OneToMany(mappedBy = "music")
+    private List<Diary> diary = new ArrayList<>();
 
     @OneToMany(mappedBy = "music", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MusicLike> musicLikes = new ArrayList<>();

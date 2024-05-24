@@ -17,6 +17,6 @@ public class MusicLikes implements Serializable {
     @Id
     private String id;
 
-    private Long musicId;
+    private String spotify;
 
 }

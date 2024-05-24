@@ -37,7 +37,7 @@ public class MusicController {
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String socialId = principal.getUsername();
 
-        musicLikesService.likeMusic(musicLikeRequest.getMusicId(),socialId,musicLikeRequest.isLike());
+        musicLikesService.likeMusic(musicLikeRequest.getSpotify(),socialId,musicLikeRequest.isLike());
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -47,14 +47,14 @@ public class MusicController {
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String socialId = principal.getUsername();
 
-        musicLikesService.likeMusic(musicLikeRequest.getMusicId(), socialId, musicLikeRequest.isLike());
+        musicLikesService.likeMusic(musicLikeRequest.getSpotify(), socialId, musicLikeRequest.isLike());
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/top-liked")
-    public ResponseEntity<Object> getTopLikedMusicIds(@RequestParam(defaultValue = "10") int limit) {
-        Set<String> topLikedMusicIds = musicLikesService.getTopLikedMusicIds(limit);
-        return ResponseEntity.ok(topLikedMusicIds);
+    public ResponseEntity<Object> getTopLikedspotifys(@RequestParam(defaultValue = "10") int limit) {
+        Set<String> topLikedspotifys = musicLikesService.getTopLikedspotifys(limit);
+        return ResponseEntity.ok(topLikedspotifys);
     }
 }

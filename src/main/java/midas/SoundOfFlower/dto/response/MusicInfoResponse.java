@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class MusicInfoResponse {
 
     private String state;
-    private String musicId;
+    private String spotify;
     private Double totalLikes;
 }
