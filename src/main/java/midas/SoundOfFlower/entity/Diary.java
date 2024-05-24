@@ -5,9 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import midas.SoundOfFlower.dto.response.DiaryInfoResponse;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,10 +23,13 @@ public class Diary {
     @Column(name = "diary_id")
     private Long id;
 
+    private String title;
+
     @Column(length = 1000)
     private String comment;
 
-    private LocalDateTime date;
+    @Column(unique = true)
+    private LocalDate date;
 
     private String flower;
 
@@ -37,13 +39,15 @@ public class Diary {
     private Double calm;
     private Double embarrased;
     private Double anxiety;
+    private Double love;
 
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "social_id", referencedColumnName = "socialId")
     private User user;
 
-    @OneToOne
-    @JoinColumn(name = "music_id")
+    @ManyToOne
+    @JoinColumn(name = "spotify", referencedColumnName = "spotify")
     private Music music;
 
     @OneToMany(mappedBy = "diary", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -60,44 +64,40 @@ public class Diary {
         }
     }
 
+    public void setMusic(Music music) {
+        if (this.music != null) {
+            this.music.getDiary().remove(this);
+        }
+
+        this.music = music;
+        if (music != null) {
+            music.getDiary().add(this);
+        }
+    }
+
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
     public void updateComment(String comment) {
         this.comment = comment;
     }
 
-    public void updateEmotion(Double angry, Double sad, Double delight, Double calm, Double embarrased, Double anxiety) {
+    public void updateEmotion(Double angry, Double sad, Double delight, Double calm, Double embarrased, Double anxiety, Double love) {
         this.angry = angry;
         this.sad = sad;
         this.delight = delight;
         this.calm = calm;
         this.embarrased = embarrased;
         this.anxiety = anxiety;
+        this.love = love;
     }
 
     public void updateFlower(String flower) {
         this.flower = flower;
     }
 
-    public void updateMusicInfo(Music music) {
-        this.music = music;
-    }
-
     public void setImageUrls(List<DiaryImage> imageUrls) {
         this.imageUrls = imageUrls;
-    }
-
-    public DiaryInfoResponse toDiaryInfoResponse() {
-        return DiaryInfoResponse.builder()
-                .angry(this.angry)
-                .sad(this.sad)
-                .delight(this.delight)
-                .calm(this.calm)
-                .embarrased(this.embarrased)
-                .anxiety(this.anxiety)
-                .flower(this.flower)
-                .musicId(this.music.getMusicId())
-                .title(this.music.getTitle())
-                .singer(this.music.getSinger())
-                .likes(this.music.getLikes())
-                .build();
     }
 }

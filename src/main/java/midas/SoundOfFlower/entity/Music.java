@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @NoArgsConstructor
 @Entity
@@ -15,9 +18,13 @@ import lombok.NoArgsConstructor;
 public class Music {
 
     @Id
-    private Long musicId;
-    private String title;
-    private String singer;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "music_id")
+    private Long id;
+
+    @Column(name = "spotify", unique = true, nullable = false)
+    private String spotify;
+
 
     private Double angry;
     private Double sad;
@@ -25,7 +32,17 @@ public class Music {
     private Double calm;
     private Double embarrased;
     private Double anxiety;
+    private Double love;
 
-    private Double likes;
+    private Double totalLikes;
 
+    @OneToMany(mappedBy = "music")
+    private List<Diary> diary = new ArrayList<>();
+
+    @OneToMany(mappedBy = "music", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MusicLike> musicLikes = new ArrayList<>();
+
+    public void setTotalLikes(Double totalLikes) {
+        this.totalLikes = totalLikes;
+    }
 }

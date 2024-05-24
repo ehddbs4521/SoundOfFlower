@@ -13,6 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 public class DiaryInfoResponse {
 
+    private Long diaryId;
+
     private String flower;
 
     private List<String> imgUrl;
@@ -23,12 +25,11 @@ public class DiaryInfoResponse {
     private Double calm;
     private Double embarrased;
     private Double anxiety;
+    private Double love;
 
-    private Long musicId;
-    private String title;
-    private String singer;
-    private Double likes;
-    private Double disLikes;
+    private String spotify;
+
+    private boolean isLike;
 
     public void updateFlower(String flower) {
         this.flower = flower;
@@ -38,20 +39,25 @@ public class DiaryInfoResponse {
         this.imgUrl = imgUrl;
     }
 
-    public void updateEmotion(Double angry, Double sad, Double delight, Double calm, Double embarrased, Double anxiety) {
+    public void updateEmotion(Double angry, Double sad, Double delight, Double calm, Double embarrased, Double anxiety,Double love) {
         this.angry = angry;
         this.sad = sad;
         this.delight = delight;
         this.calm = calm;
         this.embarrased = embarrased;
         this.anxiety = anxiety;
+        this.love = love;
     }
 
-    public void updateMusicDetails(Long musicId, String title, String singer, Double likes, Double disLikes) {
-        this.musicId = musicId;
-        this.title = title;
-        this.singer = singer;
-        this.likes = likes;
-        this.disLikes = disLikes;
+    public void updateMusic(String spotify) {
+        this.spotify = spotify;
+    }
+
+    public void updateLike(boolean isLike) {
+        this.isLike = isLike;
+    }
+
+    public void setImgUrl(List<String> imgUrl) {
+        this.imgUrl = imgUrl;
     }
 }

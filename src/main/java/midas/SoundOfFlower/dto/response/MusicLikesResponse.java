@@ -1,16 +1,17 @@
-package midas.SoundOfFlower.dto.request;
+package midas.SoundOfFlower.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Builder
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WriteDiaryRequest {
+public class MusicLikesResponse {
 
-    private String title;
-    private String comment;
+    private Double totalLikes;
+    private boolean like;
+
 }

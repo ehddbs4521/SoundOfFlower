@@ -3,6 +3,8 @@ package midas.SoundOfFlower.service;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import midas.SoundOfFlower.entity.DiaryImage;
 import midas.SoundOfFlower.error.CustomException;
 import midas.SoundOfFlower.repository.diary.DiaryRepository;
 import midas.SoundOfFlower.repository.diaryimage.DiaryImageRepository;
@@ -18,6 +20,7 @@ import java.util.List;
 import static midas.SoundOfFlower.error.ErrorCode.OVER_COUNT;
 import static midas.SoundOfFlower.error.ErrorCode.OVER_SIZE;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DiaryImageService {
@@ -87,7 +90,8 @@ public class DiaryImageService {
         return true;
     }
 
-    public List<String> updateImageUrls(Long diaryId, List<MultipartFile> images) throws IOException {
+    @Transactional
+    public List<String> updateImageUrls(List<DiaryImage> diaryImages, List<MultipartFile> images) throws IOException {
 
         if (!checkImageCount(images)) {
             throw new CustomException(OVER_COUNT);
@@ -96,9 +100,7 @@ public class DiaryImageService {
         if (!checkImageSize(images)) {
             throw new CustomException(OVER_SIZE);
         }
-
-        diaryImageRepository.deleteDiaryImage(diaryId);
-
+        diaryImageRepository.deleteDiaryImage(diaryImages);
         List<String> newUrls = saveImages(images);
 
         return newUrls;

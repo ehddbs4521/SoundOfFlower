@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 
+@Slf4j
 @Getter
 @NoArgsConstructor
 @Entity
@@ -32,7 +34,6 @@ public class DiaryImage {
         if (this.diary != null) {
             this.diary.getImageUrls().remove(this);
         }
-
         this.diary = diary;
         if (diary != null && diary.getImageUrls() != null) {
             diary.getImageUrls().add(this);
