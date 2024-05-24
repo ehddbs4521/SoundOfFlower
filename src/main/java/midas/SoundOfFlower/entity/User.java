@@ -64,7 +64,7 @@ public class User {
     public Diary findDiaryByDate(Long year, Long month, Long day) {
         LocalDate targetDate = LocalDate.of(year.intValue(), month.intValue(), day.intValue());
         return diary.stream()
-                .filter(d -> d.getDate().toLocalDate().isEqual(targetDate))
+                .filter(d -> d.getDate().isEqual(targetDate))
                 .findFirst()
                 .orElse(null);
     }
