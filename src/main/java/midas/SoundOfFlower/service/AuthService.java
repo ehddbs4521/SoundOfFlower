@@ -174,7 +174,7 @@ public class AuthService {
 
         TokenStatus tokenValid = jwtService.isTokenValid(refreshToken);
 
-        if (!tokenValid.equals(EXPIRED)) {
+        if (tokenValid.equals(EXPIRED)) {
             jwtErrorHandler.tokenError(tokenValid);
         }
         if (blackListRepository.existsByAccessToken(accessToken)) {
