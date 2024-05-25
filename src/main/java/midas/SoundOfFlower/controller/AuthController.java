@@ -1,10 +1,12 @@
 package midas.SoundOfFlower.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import midas.SoundOfFlower.dto.request.*;
+import midas.SoundOfFlower.jwt.dto.response.TokenResponse;
 import midas.SoundOfFlower.jwt.service.JwtService;
 import midas.SoundOfFlower.service.AuthService;
 import org.springframework.http.HttpStatus;
@@ -54,7 +56,7 @@ public class AuthController {
     }
 
     @PostMapping("/auth/register")
-    public ResponseEntity<Object> signup(@RequestPart(value = "file", required = false) MultipartFile multipartFile, @Valid @RequestPart(value = "userRequestDto") UserRequest userRequest) throws IOException {
+    public ResponseEntity<Object> signup(@RequestPart(value = "file", required = false) MultipartFile multipartFile, @Valid @RequestPart(value = "signup") UserRequest userRequest) throws IOException {
 
         authService.signup(userRequest.getEmail(), userRequest.getPassword(), multipartFile, userRequest.getNickName());
 
@@ -74,11 +76,23 @@ public class AuthController {
 
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String socialId = principal.getUsername();
-        log.info("socialId:{}", socialId);
         String accessToken = jwtService.extractAccessToken(request).get();
         authService.logout(accessToken, socialId);
         SecurityContextHolder.clearContext();
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/token/reissue")
+    public ResponseEntity<Object> refresh(HttpServletRequest request, HttpServletResponse response) {
+
+        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String socialId = principal.getUsername();
+        String accessToken = jwtService.extractAccessToken(request).get();
+        String refreshToken = jwtService.extractRefreshToken(request).get();
+        TokenResponse tokenResponse = authService.validateToken(accessToken,refreshToken, socialId);
+        jwtService.setTokens(response, tokenResponse.getAccessToken(), tokenResponse.getRefreshToken());
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

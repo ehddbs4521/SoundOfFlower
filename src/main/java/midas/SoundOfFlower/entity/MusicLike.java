@@ -24,7 +24,7 @@ public class MusicLike {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "spotify_id", referencedColumnName = "spotify")
+    @JoinColumn(name = "spotify", referencedColumnName = "spotify")
     private Music music;
 
     private Boolean isLike;

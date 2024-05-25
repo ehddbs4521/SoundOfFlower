@@ -51,7 +51,8 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             AntPathMatcher pathMatcher = new AntPathMatcher();
             String requestURI = request.getRequestURI();
 
-            if (requestURI.equals(LOGIN_CHECK_URL) || pathMatcher.match("/auth/**", requestURI)|| pathMatcher.match("/diary/test/**", requestURI)) {
+            if (requestURI.equals(LOGIN_CHECK_URL) ||pathMatcher.match("/auth/**", requestURI)){
+
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -64,7 +65,6 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             }
 
             TokenStatus tokenStatus = jwtService.isTokenValid(accessToken.get());
-
             if (tokenStatus.equals(TokenStatus.SUCCESS)) {
                 checkAccessTokenAndAuthentication(request, response, filterChain);
                 return;
@@ -73,9 +73,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             if (tokenStatus.equals(TokenStatus.EXPIRED) && pathMatcher.match("/token/reissue", requestURI)) {
 
                 String socialId = request.getHeader("socialId");
-
                 TokenResponse tokenResponse = authService.validateToken(accessToken.get(), refreshToken.get(), socialId);
-
                 jwtService.setTokens(response, tokenResponse.getAccessToken(), tokenResponse.getRefreshToken());
             } else {
                 jwtErrorHandler.tokenError(tokenStatus);
@@ -85,6 +83,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
         }
 
     }
+
 
     public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
                                                   FilterChain filterChain) throws ServletException, IOException {

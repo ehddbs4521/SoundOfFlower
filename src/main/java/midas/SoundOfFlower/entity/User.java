@@ -25,15 +25,21 @@ public class User {
     private Long id;
 
     private String email; // 이메일
+
+    @Column(length = 15)
     private String password; // 비밀번호
+
+    @Column(length = 30)
     private String nickName; // 닉네임
     private String imageUrl; // 프로필 이미지
 
+    @Column(length = 5)
     private String role;
 
+    @Column(length = 15)
     private String socialType; // KAKAO, NAVER, GOOGLE
 
-    @Column(unique = true)
+    @Column(unique = true, length = 100)
     private String socialId; // 로그인한 소셜 타입의 식별자 값
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

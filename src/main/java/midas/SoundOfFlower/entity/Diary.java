@@ -23,6 +23,7 @@ public class Diary {
     @Column(name = "diary_id")
     private Long id;
 
+    @Column(length = 50)
     private String title;
 
     @Column(length = 1000)
@@ -31,6 +32,7 @@ public class Diary {
     @Column(unique = true)
     private LocalDate date;
 
+    @Column(length = 10)
     private String flower;
 
     private Double angry;

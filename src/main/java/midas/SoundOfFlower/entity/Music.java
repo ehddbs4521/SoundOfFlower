@@ -18,13 +18,8 @@ import java.util.List;
 public class Music {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "music_id")
-    private Long id;
-
-    @Column(name = "spotify", unique = true, nullable = false)
+    @Column(name = "spotify", unique = true, nullable = false,length = 30)
     private String spotify;
-
 
     private Double angry;
     private Double sad;
