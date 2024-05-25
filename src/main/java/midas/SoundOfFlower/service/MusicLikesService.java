@@ -135,7 +135,7 @@ public class MusicLikesService {
 
             for (Music music : topLikedMusics) {
                 redisTemplate.opsForZSet().add(TOTAL_LIKES, music.getSpotify().toString(), music.getTotalLikes());
-                resultMap.put(music.getSpotify().toString(), music.getTotalLikes());
+                resultMap.put(music.getSpotify(), music.getTotalLikes());
             }
 
         } else {

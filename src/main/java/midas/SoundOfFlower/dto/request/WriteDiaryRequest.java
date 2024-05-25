@@ -13,4 +13,6 @@ public class WriteDiaryRequest {
 
     private String title;
     private String comment;
+    private String emotion;
+    private String maintain;
 }

@@ -57,7 +57,8 @@ public class DiaryService {
             throw new CustomException(NOT_EXIST_TITLE_DIARY);
         }
 
-        DiaryInfoResponse diaryInfoResponse = analyzeEmotion(writeDiaryRequest.getComment());
+
+        DiaryInfoResponse diaryInfoResponse = analyzeEmotion(writeDiaryRequest.getComment(), writeDiaryRequest.getEmotion(), writeDiaryRequest.getMaintain());
         LocalDate LocalDate = createLocalDate(year, month, day);
         User user = userRepository.findBySocialId(socialId)
                 .orElseThrow(() -> new CustomException(NOT_EXIST_USER_SOCIALID));
@@ -86,7 +87,8 @@ public class DiaryService {
         return diaryInfoResponse;
     }
 
-    private DiaryInfoResponse analyzeEmotion(String comment) {
+    private DiaryInfoResponse analyzeEmotion(String comment, String emotion, String maintain) {
+
         try {
             String url = "http://localhost:8000/analyze/emotion";
             HttpHeaders headers = new HttpHeaders();
@@ -94,6 +96,8 @@ public class DiaryService {
 
             Map<String, String> requestMap = new HashMap<>();
             requestMap.put("comment", comment);
+            requestMap.put("emotion", emotion);
+            requestMap.put("maintain", maintain);
 
             HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(requestMap, headers);
             return restTemplate.postForObject(url, requestEntity, DiaryInfoResponse.class);
@@ -154,7 +158,8 @@ public class DiaryService {
         }
 
         if (writeDiaryRequest.getComment() != null) {
-            diaryInfoResponse = analyzeEmotion(writeDiaryRequest.getComment());
+            diaryInfoResponse = analyzeEmotion(writeDiaryRequest.getComment(), writeDiaryRequest.getEmotion(), writeDiaryRequest.getMaintain());
+
             diary.updateComment(writeDiaryRequest.getComment());
             diary.updateEmotion(diaryInfoResponse.getAngry(),
                     diaryInfoResponse.getSad(),
