@@ -23,7 +23,6 @@ public class DiaryImage {
     @Column(name = "diary_image_id")
     private Long id;
 
-    @Column(length = 1000)
     private String url;
 
     @ManyToOne
