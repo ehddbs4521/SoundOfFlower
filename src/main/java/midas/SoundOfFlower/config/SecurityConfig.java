@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import midas.SoundOfFlower.entity.Role;
 import midas.SoundOfFlower.jwt.error.JwtErrorHandler;
 import midas.SoundOfFlower.jwt.filter.JwtAuthenticationProcessingFilter;
 import midas.SoundOfFlower.jwt.service.JwtService;
@@ -55,25 +56,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf((auth) -> auth.disable())
+                .csrf((csrf) -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
-                .formLogin((auth) -> auth.disable());
-
-        http
-                .httpBasic((auth) -> auth.disable());
-        http
-                .sessionManagement((session) -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http
-                .authorizeHttpRequests((auth) -> auth
+                .formLogin(formLogin -> formLogin.disable())
+                .httpBasic(httpBasic -> httpBasic.disable())
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
-                        .anyRequest().authenticated());
-        http
-                .oauth2Login((oauth2) -> oauth2
+                        .requestMatchers("/admin/**").hasRole(Role.ADMIN.getKey())
+                        .anyRequest().authenticated())
+                .oauth2Login(oauth2 -> oauth2
                         .loginPage("/login")
                         .successHandler(oAuth2LoginSuccessHandler)
                         .failureHandler(oAuth2LoginFailureHandler)
-                        .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
+                        .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(customOAuth2UserService)));
 
         http.addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class);

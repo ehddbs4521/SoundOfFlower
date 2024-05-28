@@ -26,7 +26,7 @@ public class User {
 
     private String email; // 이메일
 
-    @Column(length = 15)
+    @Column(length = 2555)
     private String password; // 비밀번호
 
     @Column(length = 30)

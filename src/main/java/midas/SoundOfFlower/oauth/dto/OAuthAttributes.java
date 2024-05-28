@@ -64,7 +64,7 @@ public class OAuthAttributes {
                 .nickName(UUID.randomUUID().toString().replace("-", "").substring(0, 8))
                 .password(passwordEncoder.encode(UUID.randomUUID().toString().replace("-", "").substring(0, 10))) // Use the PasswordEncoder here
                 .imageUrl(oauth2UserInfo.getImageUrl())
-                .role(Role.GUEST.getKey())
+                .role(Role.USER.getKey())
                 .build();
     }
 

@@ -72,16 +72,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         if (users.isEmpty()) {
             user = saveUser(attributes, socialType,passwordEncoder);
         } else {
-            changeRole(users);
             user = users.get();
         }
         return user;
-    }
-
-    private void changeRole(Optional<User> users) {
-        User user = users.get();
-        user.updateRole(Role.USER.getKey());
-        userRepository.save(user);
     }
 
     private User saveUser(OAuthAttributes attributes, String socialType,PasswordEncoder passwordEncoder) {

@@ -48,7 +48,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
             String refreshToken = jwtService.generateRefreshToken(oAuth2User.getSocialId());
             User user = userRepository.findBySocialId(oAuth2User.getSocialId()).orElseThrow(() -> new CustomException(NOT_EXIST_USER_SOCIALID));
 
-            if(oAuth2User.getRole() == Role.GUEST.getKey()) {
+            if(oAuth2User.getRole() == Role.USER.getKey()) {
 
                 String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:3000/login-success")
                         .queryParam("email",oAuth2User.getEmail())

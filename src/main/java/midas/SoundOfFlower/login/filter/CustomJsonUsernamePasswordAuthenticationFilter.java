@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.util.StreamUtils;
 
 import java.io.IOException;
@@ -22,23 +23,26 @@ import java.util.Map;
 import static midas.SoundOfFlower.error.CustomServletException.sendJsonError;
 import static midas.SoundOfFlower.error.ErrorCode.NOT_EQUAL_JSON;
 
-
 @Slf4j
 public class CustomJsonUsernamePasswordAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
-    private static final String DEFAULT_LOGIN_REQUEST_URL = "/auth/token/login"; // "/login"으로 오는 요청을 처리
-    private static final String HTTP_METHOD = "POST"; // 로그인 HTTP 메소드는 POST
-    private static final String CONTENT_TYPE = "application/json"; // JSON 타입의 데이터로 오는 로그인 요청만 처리
-    private static final String USERNAME_KEY = "email"; // 회원 로그인 시 이메일 요청 JSON Key : "email"
-    private static final String SOCIAL_KEY = "socialType"; // 회원 로그인 시 소셜ID 요청 JSON Key : "socialId"
-    private static final String PASSWORD_KEY = "password"; // 회원 로그인 시 비밀번호 요청 JSon Key : "password"
+    private static final String DEFAULT_LOGIN_REQUEST_URL = "/auth/token/login";
+    private static final String ADMIN_LOGIN_REQUEST_URL = "/auth/admin/token/login";
+    private static final String HTTP_METHOD = "POST";
+    private static final String CONTENT_TYPE = "application/json";
+    private static final String USERNAME_KEY = "email";
+    private static final String SOCIAL_KEY = "socialType";
+    private static final String PASSWORD_KEY = "password";
+    private static final String ROLE = "role";
     private static final AntPathRequestMatcher DEFAULT_LOGIN_PATH_REQUEST_MATCHER =
             new AntPathRequestMatcher(DEFAULT_LOGIN_REQUEST_URL, HTTP_METHOD);
+    private static final AntPathRequestMatcher ADMIN_LOGIN_PATH_REQUEST_MATCHER =
+            new AntPathRequestMatcher(ADMIN_LOGIN_REQUEST_URL, HTTP_METHOD);
 
     private final ObjectMapper objectMapper;
     private final UserRepository userRepository;
 
     public CustomJsonUsernamePasswordAuthenticationFilter(ObjectMapper objectMapper, UserRepository userRepository) {
-        super(DEFAULT_LOGIN_PATH_REQUEST_MATCHER);
+        super(new OrRequestMatcher(DEFAULT_LOGIN_PATH_REQUEST_MATCHER, ADMIN_LOGIN_PATH_REQUEST_MATCHER));
         this.objectMapper = objectMapper;
         this.userRepository = userRepository;
     }
@@ -57,8 +61,9 @@ public class CustomJsonUsernamePasswordAuthenticationFilter extends AbstractAuth
             String email = usernamePasswordMap.get(USERNAME_KEY);
             String password = usernamePasswordMap.get(PASSWORD_KEY);
             String socialType = usernamePasswordMap.get(SOCIAL_KEY);
+            String role = usernamePasswordMap.get(ROLE);
 
-            User user = userRepository.findBySocialTypeAndEmail(socialType, email).get();
+            User user = userRepository.findBySocialTypeAndEmailAndRole(socialType, email, role).orElseThrow(() -> new CustomException(NOT_EQUAL_JSON));
 
             UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(user.getSocialId(), password);
 

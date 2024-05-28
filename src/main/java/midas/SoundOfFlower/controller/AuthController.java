@@ -63,6 +63,14 @@ public class AuthController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PostMapping("/auth/admin/register")
+    public ResponseEntity<Object> signup(@Valid @RequestBody AdminUserRequest adminUserRequest) {
+
+        authService.adminSignUp(adminUserRequest);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
     @PutMapping("/auth/reset/password")
     public ResponseEntity<Object> resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
 
@@ -94,5 +102,10 @@ public class AuthController {
         jwtService.setTokens(response, tokenResponse.getAccessToken(), tokenResponse.getRefreshToken());
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/admin")
+    public String test() {
+        return "test";
     }
 }
