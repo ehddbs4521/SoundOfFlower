@@ -97,7 +97,6 @@ public class JwtService {
                     .get(EMAIL_CLAIM, String.class)
             );
         } catch (Exception e) {
-            log.error("액세스 토큰이 유효하지 않습니다.");
             return Optional.empty();
         }
     }
@@ -142,7 +141,6 @@ public class JwtService {
                     .get(SOCIAL_ID, String.class)
             );
         } catch (Exception e) {
-            log.error("액세스 토큰이 유효하지 않습니다.");
             return Optional.empty();
         }
     }
